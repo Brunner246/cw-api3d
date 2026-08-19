@@ -14,6 +14,7 @@ add_subdirectory(src/ports)
 add_subdirectory(src/application)
 add_subdirectory(src/adapters/driven/logging)
 add_subdirectory(src/adapters/driven/cadwork)
+add_subdirectory(src/composition)
 
 enable_testing()
 add_subdirectory(tests)
