@@ -28,3 +28,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/lib/relwit
 if (MSVC)
     add_compile_options(/EHsc /utf-8 /wd4251 /wd4275)
 endif()
+
+# Per-configuration compile definitions
+add_compile_definitions(
+    $<$<CONFIG:Debug>:CW_BUILD_DEBUG>
+    $<$<CONFIG:RelWithDebInfo>:CW_BUILD_RELWITHDEBINFO>
+    $<$<CONFIG:Release>:CW_BUILD_RELEASE>
+)

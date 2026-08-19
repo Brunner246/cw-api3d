@@ -10,6 +10,12 @@ build/
 CMakeUserPresets.json
 vcpkg_installed/
 
+# Python & UV
+.venv/
+.pytest_cache/
+__pycache__/
+*.pyc
+
 docs/architecture/
 docs/research/
 docs/sessions/

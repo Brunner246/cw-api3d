@@ -70,6 +70,25 @@ TEST_F(CompositionRootTests, ProductionBootstrapperWithStubFactorySuccess) {
     EXPECT_EQ(*result, std::filesystem::path("D:/cadwork_plugins/cw_api3d"));
 }
 
+TEST_F(CompositionRootTests, ProductionBootstrapperConfiguresExpectedLogLevel) {
+    StubCwAPI3DUtilityController stubUtil("D:/cadwork_plugins/cw_api3d");
+    StubCwAPI3DControllerFactory factory(&stubUtil);
+
+    auto bootstrapper = PluginBootstrapper::createProduction(&factory);
+    ASSERT_NE(bootstrapper, nullptr);
+    ASSERT_NE(bootstrapper->logger(), nullptr);
+
+#if defined(CW_BUILD_RELWITHDEBINFO)
+    EXPECT_EQ(bootstrapper->logger()->getLevel(), LogLevel::Debug);
+#elif defined(CW_BUILD_RELEASE)
+    EXPECT_EQ(bootstrapper->logger()->getLevel(), LogLevel::Info);
+#elif defined(CW_BUILD_DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    EXPECT_EQ(bootstrapper->logger()->getLevel(), LogLevel::Trace);
+#else
+    EXPECT_EQ(bootstrapper->logger()->getLevel(), LogLevel::Info);
+#endif
+}
+
 TEST_F(CompositionRootTests, BootstrapPluginFunctionReturnsTrueOnSuccess) {
     StubCwAPI3DUtilityController stubUtil("D:/cadwork_plugins/cw_api3d");
     StubCwAPI3DControllerFactory factory(&stubUtil);
