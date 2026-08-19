@@ -9,6 +9,7 @@ build/
 *.suo
 CMakeUserPresets.json
 vcpkg_installed/
+.vcpkg_cache/
 
 # Python & UV
 .venv/
