@@ -17,82 +17,89 @@ using namespace cw_api3d::ports;
 static_assert(concepts::Logger<SpdLogLogger>, "SpdLogLogger must satisfy concepts::Logger");
 static_assert(std::derived_from<SpdLogLogger, interfaces::ILogger>, "SpdLogLogger must derive from ILogger");
 
-class SpdLogLoggerTests : public ::testing::Test {
+class SpdLogLoggerTests : public ::testing::Test
+{
 protected:
-    void SetUp() override {
-        oss_ = std::make_shared<std::ostringstream>();
-        auto ostream_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(*oss_);
-        raw_spdlog_ = std::make_shared<spdlog::logger>("test_logger", ostream_sink);
-        raw_spdlog_->set_pattern("%v"); // Output message only for deterministic assertions
-        raw_spdlog_->set_level(spdlog::level::trace);
-        logger_ = std::make_unique<SpdLogLogger>(raw_spdlog_);
-    }
+  void SetUp() override
+  {
+    mOss = std::make_shared<std::ostringstream>();
+    auto ostreamSink = std::make_shared<spdlog::sinks::ostream_sink_mt>(*mOss);
+    mRawSpdlog = std::make_shared<spdlog::logger>("test_logger", ostreamSink);
+    mRawSpdlog->set_pattern("%v"); // Output message only for deterministic assertions
+    mRawSpdlog->set_level(spdlog::level::trace);
+    mLogger = std::make_unique<SpdLogLogger>(mRawSpdlog);
+  }
 
-    std::shared_ptr<std::ostringstream> oss_;
-    std::shared_ptr<spdlog::logger> raw_spdlog_;
-    std::unique_ptr<SpdLogLogger> logger_;
+  std::shared_ptr<std::ostringstream> mOss;
+  std::shared_ptr<spdlog::logger> mRawSpdlog;
+  std::unique_ptr<SpdLogLogger> mLogger;
 };
 
-TEST_F(SpdLogLoggerTests, LogsAtAllLevelsWhenTraceEnabled) {
-    logger_->set_level(LogLevel::Trace);
+TEST_F(SpdLogLoggerTests, LogsAtAllLevelsWhenTraceEnabled)
+{
+  mLogger->setLevel(LogLevel::Trace);
 
-    logger_->trace("Trace message");
-    logger_->debug("Debug message");
-    logger_->info("Info message");
-    logger_->warn("Warn message");
-    logger_->error("Error message");
-    logger_->critical("Critical message");
+  mLogger->trace("Trace message");
+  mLogger->debug("Debug message");
+  mLogger->info("Info message");
+  mLogger->warn("Warn message");
+  mLogger->error("Error message");
+  mLogger->critical("Critical message");
 
-    const std::string output = oss_->str();
-    EXPECT_NE(output.find("Trace message"), std::string::npos);
-    EXPECT_NE(output.find("Debug message"), std::string::npos);
-    EXPECT_NE(output.find("Info message"), std::string::npos);
-    EXPECT_NE(output.find("Warn message"), std::string::npos);
-    EXPECT_NE(output.find("Error message"), std::string::npos);
-    EXPECT_NE(output.find("Critical message"), std::string::npos);
+  const std::string output = mOss->str();
+  EXPECT_NE(output.find("Trace message"), std::string::npos);
+  EXPECT_NE(output.find("Debug message"), std::string::npos);
+  EXPECT_NE(output.find("Info message"), std::string::npos);
+  EXPECT_NE(output.find("Warn message"), std::string::npos);
+  EXPECT_NE(output.find("Error message"), std::string::npos);
+  EXPECT_NE(output.find("Critical message"), std::string::npos);
 }
 
-TEST_F(SpdLogLoggerTests, FiltersMessagesBelowConfiguredLevel) {
-    logger_->set_level(LogLevel::Warn);
+TEST_F(SpdLogLoggerTests, FiltersMessagesBelowConfiguredLevel)
+{
+  mLogger->setLevel(LogLevel::Warn);
 
-    EXPECT_FALSE(logger_->is_enabled(LogLevel::Trace));
-    EXPECT_FALSE(logger_->is_enabled(LogLevel::Debug));
-    EXPECT_FALSE(logger_->is_enabled(LogLevel::Info));
-    EXPECT_TRUE(logger_->is_enabled(LogLevel::Warn));
-    EXPECT_TRUE(logger_->is_enabled(LogLevel::Error));
-    EXPECT_TRUE(logger_->is_enabled(LogLevel::Critical));
+  EXPECT_FALSE(mLogger->isEnabled(LogLevel::Trace));
+  EXPECT_FALSE(mLogger->isEnabled(LogLevel::Debug));
+  EXPECT_FALSE(mLogger->isEnabled(LogLevel::Info));
+  EXPECT_TRUE(mLogger->isEnabled(LogLevel::Warn));
+  EXPECT_TRUE(mLogger->isEnabled(LogLevel::Error));
+  EXPECT_TRUE(mLogger->isEnabled(LogLevel::Critical));
 
-    logger_->info("Should be dropped");
-    logger_->warn("Should be logged");
-    logger_->error("Should also be logged");
+  mLogger->info("Should be dropped");
+  mLogger->warn("Should be logged");
+  mLogger->error("Should also be logged");
 
-    const std::string output = oss_->str();
-    EXPECT_EQ(output.find("Should be dropped"), std::string::npos);
-    EXPECT_NE(output.find("Should be logged"), std::string::npos);
-    EXPECT_NE(output.find("Should also be logged"), std::string::npos);
+  const std::string output = mOss->str();
+  EXPECT_EQ(output.find("Should be dropped"), std::string::npos);
+  EXPECT_NE(output.find("Should be logged"), std::string::npos);
+  EXPECT_NE(output.find("Should also be logged"), std::string::npos);
 }
 
-TEST_F(SpdLogLoggerTests, FormattingHelpersFormatCorrectly) {
-    logger_->set_level(LogLevel::Info);
+TEST_F(SpdLogLoggerTests, FormattingHelpersFormatCorrectly)
+{
+  mLogger->setLevel(LogLevel::Info);
 
-    logger_->infof("Found {} elements in model {}", 150, "RoofStructure");
+  mLogger->infof("Found {} elements in model {}", 150, "RoofStructure");
 
-    const std::string output = oss_->str();
-    EXPECT_NE(output.find("Found 150 elements in model RoofStructure"), std::string::npos);
+  const std::string output = mOss->str();
+  EXPECT_NE(output.find("Found 150 elements in model RoofStructure"), std::string::npos);
 }
 
-TEST_F(SpdLogLoggerTests, OffLevelDisablesAllLogging) {
-    logger_->set_level(LogLevel::Off);
-    EXPECT_EQ(logger_->get_level(), LogLevel::Off);
-    EXPECT_FALSE(logger_->is_enabled(LogLevel::Critical));
+TEST_F(SpdLogLoggerTests, OffLevelDisablesAllLogging)
+{
+  mLogger->setLevel(LogLevel::Off);
+  EXPECT_EQ(mLogger->getLevel(), LogLevel::Off);
+  EXPECT_FALSE(mLogger->isEnabled(LogLevel::Critical));
 
-    logger_->critical("Will not be logged");
-    EXPECT_TRUE(oss_->str().empty());
+  mLogger->critical("Will not be logged");
+  EXPECT_TRUE(mOss->str().empty());
 }
 
-TEST(SpdLogLoggerStandaloneTests, DefaultConstructorCreatesValidLogger) {
-    SpdLogLogger default_logger;
-    EXPECT_NE(default_logger.underlying(), nullptr);
-    // Should not throw or crash
-    default_logger.info("Default logger operational");
+TEST(SpdLogLoggerStandaloneTests, DefaultConstructorCreatesValidLogger)
+{
+  SpdLogLogger defaultLogger;
+  EXPECT_NE(defaultLogger.underlying(), nullptr);
+  // Should not throw or crash
+  defaultLogger.info("Default logger operational");
 }
