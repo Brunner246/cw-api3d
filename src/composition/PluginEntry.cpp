@@ -14,10 +14,17 @@
 
 #include <cwapi3d/CwAPI3D.h>
 
-CWAPI3D_PLUGIN bool plugin_x64_init(CwAPI3D::ControllerFactory* aFactory) {
-    return cw_api3d::composition::bootstrap_plugin(aFactory);
+/// In cadwork CwAPI3D conventions, plugin_x64_init returning false indicates
+/// the plugin stays loaded / completes cleanly without triggering an interactive
+/// '<Return> to continue' host modal.
+CWAPI3D_PLUGIN bool plugin_x64_init(CwAPI3D::ControllerFactory* aFactory)
+{
+  [[maybe_unused]] const bool success = cw_api3d::composition::bootstrapPlugin(aFactory);
+  return false;
 }
 
-CWAPI3D_PLUGIN bool init_cwapi3d(CwAPI3D::ControllerFactory* aFactory) {
-    return cw_api3d::composition::bootstrap_plugin(aFactory);
+CWAPI3D_PLUGIN bool init_cwapi3d(CwAPI3D::ControllerFactory* aFactory)
+{
+  [[maybe_unused]] const bool success = cw_api3d::composition::bootstrapPlugin(aFactory);
+  return false;
 }

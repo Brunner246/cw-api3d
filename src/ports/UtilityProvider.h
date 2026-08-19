@@ -5,27 +5,31 @@
 #include <memory>
 #include <optional>
 
-namespace cw_api3d::ports {
+namespace cw_api3d::ports
+{
 
-namespace interfaces {
+  namespace interfaces
+  {
 
-struct IUtilityProvider {
-    virtual ~IUtilityProvider() = default;
+    struct IUtilityProvider
+    {
+      virtual ~IUtilityProvider() = default;
 
-    [[nodiscard]] virtual std::optional<std::filesystem::path> get_plugin_path() const noexcept = 0;
-};
+      [[nodiscard]] virtual std::optional<std::filesystem::path> getPluginPath() const noexcept = 0;
+    };
 
-using UtilityProviderPtr = std::shared_ptr<IUtilityProvider>;
+    using UtilityProviderPtr = std::shared_ptr<IUtilityProvider>;
 
-} // namespace interfaces
+  } // namespace interfaces
 
-namespace concepts {
+  namespace concepts
+  {
 
-template <typename T>
-concept UtilityProvider = requires(const T& provider) {
-    { provider.get_plugin_path() } -> std::same_as<std::optional<std::filesystem::path>>;
-};
+    template<typename T>
+    concept UtilityProvider = requires(const T& provider) {
+      { provider.getPluginPath() } -> std::same_as<std::optional<std::filesystem::path>>;
+    };
 
-} // namespace concepts
+  } // namespace concepts
 
 } // namespace cw_api3d::ports

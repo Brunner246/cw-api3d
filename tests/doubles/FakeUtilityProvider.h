@@ -6,26 +6,32 @@
 #include <optional>
 #include <utility>
 
-namespace cw_api3d::tests::doubles {
+namespace cw_api3d::tests::doubles
+{
 
-class FakeUtilityProvider : public ports::interfaces::IUtilityProvider {
-public:
-    explicit FakeUtilityProvider(std::optional<std::filesystem::path> plugin_path = std::nullopt) noexcept
-        : plugin_path_(std::move(plugin_path)) {}
-
-    void set_plugin_path(std::optional<std::filesystem::path> path) {
-        std::lock_guard lock(mutex_);
-        plugin_path_ = std::move(path);
+  class FakeUtilityProvider : public ports::interfaces::IUtilityProvider
+  {
+  public:
+    explicit FakeUtilityProvider(std::optional<std::filesystem::path> pluginPath = std::nullopt) noexcept
+      : mPluginPath(std::move(pluginPath))
+    {
     }
 
-    [[nodiscard]] std::optional<std::filesystem::path> get_plugin_path() const noexcept override {
-        std::lock_guard lock(mutex_);
-        return plugin_path_;
+    void setPluginPath(std::optional<std::filesystem::path> path)
+    {
+      std::lock_guard lock(mMutex);
+      mPluginPath = std::move(path);
     }
 
-private:
-    mutable std::mutex mutex_;
-    std::optional<std::filesystem::path> plugin_path_;
-};
+    [[nodiscard]] std::optional<std::filesystem::path> getPluginPath() const noexcept override
+    {
+      std::lock_guard lock(mMutex);
+      return mPluginPath;
+    }
+
+  private:
+    mutable std::mutex mMutex;
+    std::optional<std::filesystem::path> mPluginPath;
+  };
 
 } // namespace cw_api3d::tests::doubles
