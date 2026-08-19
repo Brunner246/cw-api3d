@@ -38,3 +38,5 @@ target_compile_definitions(cw_api3d PRIVATE
         CWAPI3D_AUTHOR_NAME=L"michael.brunner"
         CWAPI3D_AUTHOR_EMAIL=L"michael.brunner@cadwork.ch"
 )
+
+cadwork_add_post_build_deploy(cw_api3d)

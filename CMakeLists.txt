@@ -7,6 +7,7 @@ project(cw_api3d
 
 include(cmake/configuration.cmake)
 include(cmake/CwAPI3D.cmake)
+include(cmake/cadwork_deploy.cmake)
 
 find_package(spdlog CONFIG REQUIRED)
 
