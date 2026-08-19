@@ -13,33 +13,33 @@ namespace cw_api3d::tests::doubles {
 /// Used to assert that the adapter never calls destroy() on host-owned strings.
 class StubCwAPI3DString final : public CwAPI3D::Interfaces::ICwAPI3DString {
 public:
-    explicit StubCwAPI3DString(std::string narrow = "") : narrow_(std::move(narrow)) {}
+    explicit StubCwAPI3DString(std::string narrow = "") : mNarrow(std::move(narrow)) {}
 
-    void destroy() override { destroy_called_ = true; }
-    uint32_t length() override { return static_cast<uint32_t>(narrow_.size()); }
+    void destroy() override { mDestroyCalled = true; }
+    uint32_t length() override { return static_cast<uint32_t>(mNarrow.size()); }
     const CwAPI3D::character* data() override { return nullptr; }
 
     const CwAPI3D::narrowCharacter* narrowData() override {
-        return return_null_narrow_data_ ? nullptr : narrow_.c_str();
+        return mReturnNullNarrowData ? nullptr : mNarrow.c_str();
     }
 
     void copyToBuffer(CwAPI3D::character*, uint32_t) override {}
     void copyToNarrowBuffer(CwAPI3D::narrowCharacter*, uint32_t) override {}
 
-    void set_return_null_narrow_data(bool return_null) noexcept {
-        return_null_narrow_data_ = return_null;
+    void setReturnNullNarrowData(bool returnNull) noexcept {
+        mReturnNullNarrowData = returnNull;
     }
 
-    void set_narrow(std::string narrow) {
-        narrow_ = std::move(narrow);
+    void setNarrow(std::string narrow) {
+        mNarrow = std::move(narrow);
     }
 
-    [[nodiscard]] bool destroy_called() const noexcept { return destroy_called_; }
+    [[nodiscard]] bool destroyCalled() const noexcept { return mDestroyCalled; }
 
 private:
-    std::string narrow_;
-    bool return_null_narrow_data_{false};
-    bool destroy_called_{false};
+    std::string mNarrow;
+    bool mReturnNullNarrowData{false};
+    bool mDestroyCalled{false};
 };
 
 /// @brief ICwAPI3DUtilityController test stub with configurable getPluginPath() behavior.
@@ -52,12 +52,12 @@ public:
     };
 
     StubCwAPI3DUtilityController() = default;
-    explicit StubCwAPI3DUtilityController(std::string plugin_path)
-        : string_(std::move(plugin_path)) {}
+    explicit StubCwAPI3DUtilityController(std::string pluginPath)
+        : mString(std::move(pluginPath)) {}
 
     CwAPI3D::Interfaces::ICwAPI3DString* getPluginPath() override {
-        ++call_count_;
-        switch (behaviour_) {
+        ++mCallCount;
+        switch (mBehaviour) {
             case Behaviour::ReturnsNullptr:
                 return nullptr;
             case Behaviour::Throws:
@@ -65,12 +65,12 @@ public:
             case Behaviour::ReturnsString:
                 break;
         }
-        return &string_;
+        return &mString;
     }
 
-    void set_behaviour(Behaviour behaviour) noexcept { behaviour_ = behaviour; }
-    [[nodiscard]] StubCwAPI3DString& string_stub() noexcept { return string_; }
-    [[nodiscard]] int call_count() const noexcept { return call_count_; }
+    void setBehaviour(Behaviour behaviour) noexcept { mBehaviour = behaviour; }
+    [[nodiscard]] StubCwAPI3DString& stringStub() noexcept { return mString; }
+    [[nodiscard]] int callCount() const noexcept { return mCallCount; }
 
     // --- Inert remainder of ICwAPI3DUtilityController ---
     CwAPI3D::Interfaces::ICwAPI3DString* getLastError(int32_t*) override { return {}; }
@@ -205,9 +205,9 @@ public:
     CwAPI3D::language getLanguageEnum() override { return {}; }
 
 private:
-    StubCwAPI3DString string_{""};
-    Behaviour behaviour_{Behaviour::ReturnsString};
-    int call_count_{0};
+    StubCwAPI3DString mString{""};
+    Behaviour mBehaviour{Behaviour::ReturnsString};
+    int mCallCount{0};
 };
 
 } // namespace cw_api3d::tests::doubles

@@ -14,10 +14,12 @@
 
 #include <cwapi3d/CwAPI3D.h>
 
-CWAPI3D_PLUGIN bool plugin_x64_init(CwAPI3D::ControllerFactory* aFactory) {
-    return cw_api3d::composition::bootstrap_plugin(aFactory);
+CWAPI3D_PLUGIN bool plugin_x64_init(CwAPI3D::ControllerFactory* aFactory)
+{
+  return cw_api3d::composition::bootstrapPlugin(aFactory);
 }
 
-CWAPI3D_PLUGIN bool init_cwapi3d(CwAPI3D::ControllerFactory* aFactory) {
-    return cw_api3d::composition::bootstrap_plugin(aFactory);
+CWAPI3D_PLUGIN bool init_cwapi3d(CwAPI3D::ControllerFactory* aFactory)
+{
+  return cw_api3d::composition::bootstrapPlugin(aFactory);
 }

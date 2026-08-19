@@ -5,75 +5,90 @@
 #include <string>
 #include <vector>
 
-namespace cw_api3d::tests::doubles {
+namespace cw_api3d::tests::doubles
+{
 
-struct LogEntry {
+  struct LogEntry
+  {
     ports::LogLevel level;
     std::string message;
 
     bool operator==(const LogEntry& other) const = default;
-};
+  };
 
-class FakeLogger : public ports::interfaces::ILogger {
-public:
-    explicit FakeLogger(ports::LogLevel initial_level = ports::LogLevel::Trace) noexcept
-        : current_level_(initial_level) {}
-
-    void set_level(ports::LogLevel level) noexcept override {
-        std::lock_guard lock(mutex_);
-        current_level_ = level;
+  class FakeLogger : public ports::interfaces::ILogger
+  {
+  public:
+    explicit FakeLogger(ports::LogLevel initialLevel = ports::LogLevel::Trace) noexcept
+      : mCurrentLevel(initialLevel)
+    {
     }
 
-    [[nodiscard]] ports::LogLevel get_level() const noexcept override {
-        std::lock_guard lock(mutex_);
-        return current_level_;
+    void setLevel(ports::LogLevel level) noexcept override
+    {
+      std::lock_guard lock(mMutex);
+      mCurrentLevel = level;
     }
 
-    [[nodiscard]] bool is_enabled(ports::LogLevel level) const noexcept override {
-        std::lock_guard lock(mutex_);
-        return static_cast<int>(level) >= static_cast<int>(current_level_) && current_level_ != ports::LogLevel::Off;
+    [[nodiscard]] ports::LogLevel getLevel() const noexcept override
+    {
+      std::lock_guard lock(mMutex);
+      return mCurrentLevel;
     }
 
-    void log(ports::LogLevel level, std::string_view message) noexcept override {
-        if (!is_enabled(level)) {
-            return;
+    [[nodiscard]] bool isEnabled(ports::LogLevel level) const noexcept override
+    {
+      std::lock_guard lock(mMutex);
+      return static_cast<int>(level) >= static_cast<int>(mCurrentLevel) && mCurrentLevel != ports::LogLevel::Off;
+    }
+
+    void log(ports::LogLevel level, std::string_view message) noexcept override
+    {
+      if (!isEnabled(level))
+      {
+        return;
+      }
+      std::lock_guard lock(mMutex);
+      mEntries.push_back(LogEntry{
+        .level = level,
+        .message = std::string(message)});
+    }
+
+    [[nodiscard]] std::vector<LogEntry> getEntries() const
+    {
+      std::lock_guard lock(mMutex);
+      return mEntries;
+    }
+
+    void clear()
+    {
+      std::lock_guard lock(mMutex);
+      mEntries.clear();
+    }
+
+    [[nodiscard]] bool hasMessage(ports::LogLevel level, std::string_view substring) const
+    {
+      std::lock_guard lock(mMutex);
+      for (const auto& entry : mEntries)
+      {
+        if (entry.level == level && entry.message.find(substring) != std::string::npos)
+        {
+          return true;
         }
-        std::lock_guard lock(mutex_);
-        entries_.push_back(LogEntry{
-            .level = level,
-            .message = std::string(message)
-        });
+      }
+      return false;
     }
 
-    [[nodiscard]] std::vector<LogEntry> get_entries() const {
-        std::lock_guard lock(mutex_);
-        return entries_;
+    [[nodiscard]] std::size_t count() const
+    {
+      std::lock_guard lock(mMutex);
+      return mEntries.size();
     }
 
-    void clear() {
-        std::lock_guard lock(mutex_);
-        entries_.clear();
-    }
-
-    [[nodiscard]] bool has_message(ports::LogLevel level, std::string_view substring) const {
-        std::lock_guard lock(mutex_);
-        for (const auto& entry : entries_) {
-            if (entry.level == level && entry.message.find(substring) != std::string::npos) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    [[nodiscard]] std::size_t count() const {
-        std::lock_guard lock(mutex_);
-        return entries_.size();
-    }
-
-private:
-    mutable std::mutex mutex_;
-    ports::LogLevel current_level_{ports::LogLevel::Trace};
-    std::vector<LogEntry> entries_;
-};
+  private:
+    mutable std::mutex mMutex;
+    ports::LogLevel mCurrentLevel{ports::LogLevel::Trace};
+    std::vector<LogEntry> mEntries;
+  };
 
 } // namespace cw_api3d::tests::doubles

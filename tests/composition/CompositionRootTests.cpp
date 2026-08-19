@@ -23,32 +23,32 @@ protected:
 };
 
 TEST_F(CompositionRootTests, BootstrapperWithFakeAdaptersSuccess) {
-    const std::filesystem::path expected_path = "C:/cadwork/plugins/my_plugin";
-    auto fake_util = std::make_shared<FakeUtilityProvider>(expected_path);
-    auto fake_logger = std::make_shared<FakeLogger>(LogLevel::Trace);
+    const std::filesystem::path expectedPath = "C:/cadwork/plugins/my_plugin";
+    auto fakeUtil = std::make_shared<FakeUtilityProvider>(expectedPath);
+    auto fakeLogger = std::make_shared<FakeLogger>(LogLevel::Trace);
 
-    PluginBootstrapper bootstrapper(fake_util, fake_logger);
+    PluginBootstrapper bootstrapper(fakeUtil, fakeLogger);
     const auto result = bootstrapper.run();
 
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(*result, expected_path);
+    EXPECT_EQ(*result, expectedPath);
 
-    EXPECT_TRUE(fake_logger->has_message(LogLevel::Trace, "Querying plugin path from host utility provider..."));
-    EXPECT_TRUE(fake_logger->has_message(LogLevel::Info, "Retrieved plugin path: C:/cadwork/plugins/my_plugin"));
-    EXPECT_EQ(bootstrapper.utility_provider(), fake_util);
-    EXPECT_EQ(bootstrapper.logger(), fake_logger);
+    EXPECT_TRUE(fakeLogger->hasMessage(LogLevel::Trace, "Querying plugin path from host utility provider..."));
+    EXPECT_TRUE(fakeLogger->hasMessage(LogLevel::Info, "Retrieved plugin path: C:/cadwork/plugins/my_plugin"));
+    EXPECT_EQ(bootstrapper.utilityProvider(), fakeUtil);
+    EXPECT_EQ(bootstrapper.logger(), fakeLogger);
 }
 
 TEST_F(CompositionRootTests, BootstrapperWithFakeAdaptersFailureWhenPathUnavailable) {
-    auto fake_util = std::make_shared<FakeUtilityProvider>(std::nullopt);
-    auto fake_logger = std::make_shared<FakeLogger>(LogLevel::Trace);
+    auto fakeUtil = std::make_shared<FakeUtilityProvider>(std::nullopt);
+    auto fakeLogger = std::make_shared<FakeLogger>(LogLevel::Trace);
 
-    PluginBootstrapper bootstrapper(fake_util, fake_logger);
+    PluginBootstrapper bootstrapper(fakeUtil, fakeLogger);
     const auto result = bootstrapper.run();
 
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), "Plugin path is not available from utility provider");
-    EXPECT_TRUE(fake_logger->has_message(LogLevel::Warn, "Plugin path is not available from utility provider"));
+    EXPECT_TRUE(fakeLogger->hasMessage(LogLevel::Warn, "Plugin path is not available from utility provider"));
 }
 
 TEST_F(CompositionRootTests, BootstrapperHandlesUninitializedDependenciesGracefully) {
@@ -59,10 +59,10 @@ TEST_F(CompositionRootTests, BootstrapperHandlesUninitializedDependenciesGracefu
 }
 
 TEST_F(CompositionRootTests, ProductionBootstrapperWithStubFactorySuccess) {
-    StubCwAPI3DUtilityController stub_util("D:/cadwork_plugins/cw_api3d");
-    StubCwAPI3DControllerFactory factory(&stub_util);
+    StubCwAPI3DUtilityController stubUtil("D:/cadwork_plugins/cw_api3d");
+    StubCwAPI3DControllerFactory factory(&stubUtil);
 
-    auto bootstrapper = PluginBootstrapper::create_production(&factory);
+    auto bootstrapper = PluginBootstrapper::createProduction(&factory);
     ASSERT_NE(bootstrapper, nullptr);
 
     const auto result = bootstrapper->run();
@@ -71,33 +71,33 @@ TEST_F(CompositionRootTests, ProductionBootstrapperWithStubFactorySuccess) {
 }
 
 TEST_F(CompositionRootTests, BootstrapPluginFunctionReturnsTrueOnSuccess) {
-    StubCwAPI3DUtilityController stub_util("D:/cadwork_plugins/cw_api3d");
-    StubCwAPI3DControllerFactory factory(&stub_util);
+    StubCwAPI3DUtilityController stubUtil("D:/cadwork_plugins/cw_api3d");
+    StubCwAPI3DControllerFactory factory(&stubUtil);
 
-    const bool success = bootstrap_plugin(&factory);
+    const bool success = bootstrapPlugin(&factory);
     EXPECT_TRUE(success);
 }
 
 TEST_F(CompositionRootTests, BootstrapPluginFunctionReturnsFalseOnUnavailablePath) {
-    StubCwAPI3DUtilityController stub_util;
-    stub_util.set_behaviour(StubCwAPI3DUtilityController::Behaviour::ReturnsNullptr);
-    StubCwAPI3DControllerFactory factory(&stub_util);
+    StubCwAPI3DUtilityController stubUtil;
+    stubUtil.setBehaviour(StubCwAPI3DUtilityController::Behaviour::ReturnsNullptr);
+    StubCwAPI3DControllerFactory factory(&stubUtil);
 
-    const bool success = bootstrap_plugin(&factory);
+    const bool success = bootstrapPlugin(&factory);
     EXPECT_FALSE(success);
 }
 
 TEST_F(CompositionRootTests, BootstrapPluginHandlesNullFactorySafely) {
-    const bool success = bootstrap_plugin(nullptr);
+    const bool success = bootstrapPlugin(nullptr);
     EXPECT_FALSE(success);
 }
 
 TEST_F(CompositionRootTests, BootstrapPluginHandlesHostExceptionsSafely) {
-    StubCwAPI3DUtilityController stub_util;
-    stub_util.set_behaviour(StubCwAPI3DUtilityController::Behaviour::Throws);
-    StubCwAPI3DControllerFactory factory(&stub_util);
+    StubCwAPI3DUtilityController stubUtil;
+    stubUtil.setBehaviour(StubCwAPI3DUtilityController::Behaviour::Throws);
+    StubCwAPI3DControllerFactory factory(&stubUtil);
 
-    const bool success = bootstrap_plugin(&factory);
+    const bool success = bootstrapPlugin(&factory);
     EXPECT_FALSE(success);
 }
 
