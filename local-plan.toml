@@ -1,0 +1,14 @@
+# local-plan.toml — written for local-planning pipeline
+# Planning docs live under `docs/` relative to this file.
+
+project_name = "cw-api3d"
+topology = "single"
+default_repo = "cw-api3d"
+
+protected_branches = ["main", "master", "develop"]
+base_branch_candidates = ["main", "master", "develop"]
+target_branch_pattern = "feature/{slug}"
+
+[autonomy]
+auto_accept_open_questions = true
+allow_auto_branch = true

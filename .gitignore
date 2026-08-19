@@ -1,0 +1,17 @@
+# Build directories
+out/
+bin/
+lib/
+build/
+.vs/
+.idea/
+*.user
+*.suo
+CMakeUserPresets.json
+vcpkg_installed/
+
+docs/architecture/
+docs/research/
+docs/sessions/
+docs/spec/
+docs/verification/

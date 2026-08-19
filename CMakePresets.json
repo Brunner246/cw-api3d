@@ -1,0 +1,86 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+          "type": "FILEPATH"
+        },
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
+      }
+    },
+    {
+      "name": "msvc-debug",
+      "inherits": "base",
+      "displayName": "MSVC Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "msvc-release",
+      "inherits": "base",
+      "displayName": "MSVC Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "msvc-relwithdebinfo",
+      "inherits": "base",
+      "displayName": "MSVC RelWithDebInfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "msvc-debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "msvc-release"
+    },
+    {
+      "name": "relwithdebinfo",
+      "configurePreset": "msvc-relwithdebinfo"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "msvc-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release",
+      "configurePreset": "msvc-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "relwithdebinfo",
+      "configurePreset": "msvc-relwithdebinfo",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}
