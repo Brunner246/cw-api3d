@@ -1,0 +1,13 @@
+[project]
+name = "cw-api3d"
+version = "0.1.0"
+description = "cadwork 3D C++ API plugin with Python E2E test harness"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/e2e"]
+python_files = ["test_*.py"]

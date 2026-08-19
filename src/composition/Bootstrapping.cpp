@@ -10,6 +10,22 @@
 
 namespace cw_api3d::composition
 {
+  namespace
+  {
+    [[nodiscard]] constexpr ports::LogLevel defaultLogLevel() noexcept
+    {
+#if defined(CW_BUILD_RELWITHDEBINFO)
+      return ports::LogLevel::Debug;
+#elif defined(CW_BUILD_RELEASE)
+      return ports::LogLevel::Info;
+#elif defined(CW_BUILD_DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+      return ports::LogLevel::Trace;
+#else
+      return ports::LogLevel::Info;
+#endif
+    }
+  } // namespace
+
   PluginBootstrapper::PluginBootstrapper(
     ports::interfaces::UtilityProviderPtr utilityProvider,
     ports::interfaces::LoggerPtr logger) noexcept
@@ -25,6 +41,7 @@ namespace cw_api3d::composition
     try
     {
       auto logger = std::make_shared<adapters::driven::logging::SpdLogLogger>();
+      logger->setLevel(defaultLogLevel());
 
       CwAPI3D::Interfaces::ICwAPI3DUtilityController* utilityCtrl = nullptr;
       if (factory != nullptr)
@@ -97,7 +114,7 @@ namespace cw_api3d::composition
   {
     try
     {
-      auto bootstrapper = PluginBootstrapper::createProduction(factory);
+      const auto bootstrapper = PluginBootstrapper::createProduction(factory);
       if (!bootstrapper)
       {
         return false;

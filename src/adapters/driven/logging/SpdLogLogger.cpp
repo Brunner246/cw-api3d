@@ -9,7 +9,7 @@ namespace cw_api3d::adapters::driven::logging
   namespace
   {
 
-    [[nodiscard]] constexpr spdlog::level::level_enum toSpdlogLevel(ports::LogLevel level) noexcept
+    [[nodiscard]] constexpr spdlog::level::level_enum toSpdlogLevel(const ports::LogLevel level) noexcept
     {
       switch (level)
       {
@@ -31,7 +31,7 @@ namespace cw_api3d::adapters::driven::logging
       return spdlog::level::info;
     }
 
-    [[nodiscard]] constexpr ports::LogLevel fromSpdlogLevel(spdlog::level::level_enum level) noexcept
+    [[nodiscard]] constexpr ports::LogLevel fromSpdlogLevel(const spdlog::level::level_enum level) noexcept
     {
       switch (level)
       {
@@ -77,7 +77,7 @@ namespace cw_api3d::adapters::driven::logging
     }
   }
 
-  void SpdLogLogger::setLevel(ports::LogLevel level) noexcept
+  void SpdLogLogger::setLevel(const ports::LogLevel level) noexcept
   {
     if (mLogger)
     {
@@ -94,7 +94,7 @@ namespace cw_api3d::adapters::driven::logging
     return fromSpdlogLevel(mLogger->level());
   }
 
-  bool SpdLogLogger::isEnabled(ports::LogLevel level) const noexcept
+  bool SpdLogLogger::isEnabled(const ports::LogLevel level) const noexcept
   {
     if (!mLogger)
     {
@@ -103,7 +103,7 @@ namespace cw_api3d::adapters::driven::logging
     return mLogger->should_log(toSpdlogLevel(level));
   }
 
-  void SpdLogLogger::log(ports::LogLevel level, std::string_view message) noexcept
+  void SpdLogLogger::log(const ports::LogLevel level, std::string_view message) noexcept
   {
     if (!mLogger)
     {
