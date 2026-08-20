@@ -8,6 +8,7 @@ build/
 *.user
 *.suo
 CMakeUserPresets.json
+.cw-userprofile
 vcpkg_installed/
 
 # Python & UV

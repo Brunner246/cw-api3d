@@ -32,6 +32,32 @@ def test_cadwork_paths_resolution() -> None:
     assert isinstance(plugin_dll, Path)
 
 
+def test_userprofil_dir_follows_checkout_marker(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Verify a checkout-local marker repoints the userprofile away from the registry value."""
+    marker = tmp_path / cadwork_paths.USERPROFILE_MARKER_NAME
+    marker.write_text(
+        "# comment line\n\nD:/cadwork/userprofil_2026_worktree\n", encoding="utf-8"
+    )
+    monkeypatch.delenv("CADWORK_USP", raising=False)
+    monkeypatch.setattr(cadwork_paths, "REPO_ROOT", tmp_path)
+
+    assert cadwork_paths.userprofil_dir() == Path("D:/cadwork/userprofil_2026_worktree")
+
+
+def test_userprofil_dir_env_overrides_checkout_marker(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Verify CADWORK_USP still wins over the checkout-local marker."""
+    marker = tmp_path / cadwork_paths.USERPROFILE_MARKER_NAME
+    marker.write_text("D:/cadwork/userprofil_2026_worktree\n", encoding="utf-8")
+    monkeypatch.setenv("CADWORK_USP", "D:/cadwork/userprofil_2026_explicit")
+    monkeypatch.setattr(cadwork_paths, "REPO_ROOT", tmp_path)
+
+    assert cadwork_paths.userprofil_dir() == Path("D:/cadwork/userprofil_2026_explicit")
+
+
 def test_stage_script_short_path(tmp_path: Path) -> None:
     """Verify that a script path whose switch token fits in 127 chars is not staged."""
     short_script = tmp_path / "driver.py"
