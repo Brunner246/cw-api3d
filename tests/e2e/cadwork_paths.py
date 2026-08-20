@@ -15,6 +15,12 @@ DEFAULT_PROFILE_YEAR = "2026"
 DEFAULT_CI_START = r"D:\cadwork.dir\ci_start.exe"
 CADWORK_EXE_RELPATH = Path("3d.x64") / "3d.exe"
 
+# Checkout-local userprofile marker written by build-scripts/new-local-profile.ps1, so a git
+# worktree deploys and tests against its own profile.
+# Keep in sync with cmake/cadwork_deploy.cmake and build-scripts/new-local-profile.ps1.
+USERPROFILE_MARKER_NAME = ".cw-userprofile"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
 
 def _registry_value(value_name: str) -> Path | None:
     """Read a string value from HKCU\\Software\\cadwork Informatik\\ENV.
@@ -43,6 +49,25 @@ def _registry_value(value_name: str) -> Path | None:
     return Path(cleaned) if cleaned else None
 
 
+def _marker_userprofil() -> Path | None:
+    """Read the checkout-local userprofile marker at the repository root.
+
+    Returns:
+        Path from the first non-blank, non-comment line, otherwise None.
+    """
+    marker = REPO_ROOT / USERPROFILE_MARKER_NAME
+    try:
+        lines = marker.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return None
+
+    for line in lines:
+        cleaned = line.strip().strip('"')
+        if cleaned and not cleaned.startswith("#"):
+            return Path(cleaned)
+    return None
+
+
 def install_dir() -> Path | None:
     """Resolve the cadwork install root directory (CADWORK.DIR).
 
@@ -56,7 +81,10 @@ def install_dir() -> Path | None:
 
 
 def userprofil_dir() -> Path | None:
-    """Resolve the cadwork userprofile directory (CADWORK_USP / CISTART_USP).
+    """Resolve the cadwork userprofile directory.
+
+    Precedence: CADWORK_USP env override, checkout-local marker, registry
+    (CADWORK_USP / CISTART_USP).
 
     Returns:
         Path to userprofile directory if found, otherwise None.
@@ -64,6 +92,10 @@ def userprofil_dir() -> Path | None:
     override = os.environ.get("CADWORK_USP")
     if override:
         return Path(override)
+
+    marker = _marker_userprofil()
+    if marker is not None:
+        return marker
 
     usp = _registry_value("CADWORK_USP")
     if usp is not None:
