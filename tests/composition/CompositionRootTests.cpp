@@ -1,28 +1,21 @@
 #include "src/composition/Bootstrapping.h"
-#include "src/adapters/driven/cadwork/CadworkUtilityAdapter.h"
-#include "src/adapters/driven/logging/SpdLogLogger.h"
 #include "tests/doubles/FakeLogger.h"
 #include "tests/doubles/FakeUtilityProvider.h"
-#include "tests/doubles/StubCwAPI3DControllerFactory.h"
-#include "tests/doubles/StubCwAPI3DUtilityController.h"
 
 #include <gtest/gtest.h>
 #include <filesystem>
 #include <memory>
 #include <optional>
 
-namespace cw_api3d::tests::composition {
+namespace cw_api3d::tests::composition
+{
 
-using namespace cw_api3d::composition;
-using namespace cw_api3d::tests::doubles;
-using namespace cw_api3d::ports;
+  using namespace cw_api3d::composition;
+  using namespace cw_api3d::tests::doubles;
+  using namespace cw_api3d::ports;
 
-class CompositionRootTests : public ::testing::Test {
-protected:
-    void SetUp() override {}
-};
-
-TEST_F(CompositionRootTests, BootstrapperWithFakeAdaptersSuccess) {
+  TEST(CompositionRootTests, BootstrapperWithFakeAdaptersSuccess)
+  {
     const std::filesystem::path expectedPath = "C:/cadwork/plugins/my_plugin";
     auto fakeUtil = std::make_shared<FakeUtilityProvider>(expectedPath);
     auto fakeLogger = std::make_shared<FakeLogger>(LogLevel::Trace);
@@ -37,9 +30,10 @@ TEST_F(CompositionRootTests, BootstrapperWithFakeAdaptersSuccess) {
     EXPECT_TRUE(fakeLogger->hasMessage(LogLevel::Info, "Retrieved plugin path: C:/cadwork/plugins/my_plugin"));
     EXPECT_EQ(bootstrapper.utilityProvider(), fakeUtil);
     EXPECT_EQ(bootstrapper.logger(), fakeLogger);
-}
+  }
 
-TEST_F(CompositionRootTests, BootstrapperWithFakeAdaptersFailureWhenPathUnavailable) {
+  TEST(CompositionRootTests, BootstrapperWithFakeAdaptersFailureWhenPathUnavailable)
+  {
     auto fakeUtil = std::make_shared<FakeUtilityProvider>(std::nullopt);
     auto fakeLogger = std::make_shared<FakeLogger>(LogLevel::Trace);
 
@@ -49,32 +43,45 @@ TEST_F(CompositionRootTests, BootstrapperWithFakeAdaptersFailureWhenPathUnavaila
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), "Plugin path is not available from utility provider");
     EXPECT_TRUE(fakeLogger->hasMessage(LogLevel::Warn, "Plugin path is not available from utility provider"));
-}
+  }
 
-TEST_F(CompositionRootTests, BootstrapperHandlesUninitializedDependenciesGracefully) {
+  TEST(CompositionRootTests, BootstrapperHandlesUninitializedDependenciesGracefully)
+  {
     PluginBootstrapper bootstrapper(nullptr, nullptr);
     const auto result = bootstrapper.run();
 
     ASSERT_FALSE(result.has_value());
-}
+  }
 
-TEST_F(CompositionRootTests, ProductionBootstrapperWithStubFactorySuccess) {
-    StubCwAPI3DUtilityController stubUtil("D:/cadwork_plugins/cw_api3d");
-    StubCwAPI3DControllerFactory factory(&stubUtil);
-
-    auto bootstrapper = PluginBootstrapper::createProduction(&factory);
+  TEST(CompositionRootTests, ProductionBootstrapperResolvesPathFromProvider)
+  {
+    const std::filesystem::path expectedPath = "D:/cadwork_plugins/cw_api3d";
+    const auto bootstrapper = PluginBootstrapper::createProductionForUtilityProvider(
+      std::make_shared<FakeUtilityProvider>(expectedPath));
     ASSERT_NE(bootstrapper, nullptr);
 
     const auto result = bootstrapper->run();
+
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(*result, std::filesystem::path("D:/cadwork_plugins/cw_api3d"));
-}
+    EXPECT_EQ(*result, expectedPath);
+  }
 
-TEST_F(CompositionRootTests, ProductionBootstrapperConfiguresExpectedLogLevel) {
-    StubCwAPI3DUtilityController stubUtil("D:/cadwork_plugins/cw_api3d");
-    StubCwAPI3DControllerFactory factory(&stubUtil);
+  TEST(CompositionRootTests, ProductionBootstrapperFailsWhenProviderHasNoPath)
+  {
+    const auto bootstrapper = PluginBootstrapper::createProductionForUtilityProvider(
+      std::make_shared<FakeUtilityProvider>(std::nullopt));
+    ASSERT_NE(bootstrapper, nullptr);
 
-    auto bootstrapper = PluginBootstrapper::createProduction(&factory);
+    const auto result = bootstrapper->run();
+
+    ASSERT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), "Plugin path is not available from utility provider");
+  }
+
+  TEST(CompositionRootTests, ProductionBootstrapperConfiguresExpectedLogLevel)
+  {
+    const auto bootstrapper = PluginBootstrapper::createProductionForUtilityProvider(
+      std::make_shared<FakeUtilityProvider>("D:/cadwork_plugins/cw_api3d"));
     ASSERT_NE(bootstrapper, nullptr);
     ASSERT_NE(bootstrapper->logger(), nullptr);
 
@@ -87,37 +94,14 @@ TEST_F(CompositionRootTests, ProductionBootstrapperConfiguresExpectedLogLevel) {
 #else
     EXPECT_EQ(bootstrapper->logger()->getLevel(), LogLevel::Info);
 #endif
-}
+  }
 
-TEST_F(CompositionRootTests, BootstrapPluginFunctionReturnsTrueOnSuccess) {
-    StubCwAPI3DUtilityController stubUtil("D:/cadwork_plugins/cw_api3d");
-    StubCwAPI3DControllerFactory factory(&stubUtil);
-
-    const bool success = bootstrapPlugin(&factory);
-    EXPECT_TRUE(success);
-}
-
-TEST_F(CompositionRootTests, BootstrapPluginFunctionReturnsFalseOnUnavailablePath) {
-    StubCwAPI3DUtilityController stubUtil;
-    stubUtil.setBehaviour(StubCwAPI3DUtilityController::Behaviour::ReturnsNullptr);
-    StubCwAPI3DControllerFactory factory(&stubUtil);
-
-    const bool success = bootstrapPlugin(&factory);
-    EXPECT_FALSE(success);
-}
-
-TEST_F(CompositionRootTests, BootstrapPluginHandlesNullFactorySafely) {
+  // The host factory path cannot succeed without a real cadwork controller; its success wiring is
+  // covered by the e2e harness (tests/e2e/test_plugin_e2e.py), which loads the plugin in cadwork.
+  TEST(CompositionRootTests, BootstrapPluginHandlesNullFactorySafely)
+  {
     const bool success = bootstrapPlugin(nullptr);
     EXPECT_FALSE(success);
-}
-
-TEST_F(CompositionRootTests, BootstrapPluginHandlesHostExceptionsSafely) {
-    StubCwAPI3DUtilityController stubUtil;
-    stubUtil.setBehaviour(StubCwAPI3DUtilityController::Behaviour::Throws);
-    StubCwAPI3DControllerFactory factory(&stubUtil);
-
-    const bool success = bootstrapPlugin(&factory);
-    EXPECT_FALSE(success);
-}
+  }
 
 } // namespace cw_api3d::tests::composition

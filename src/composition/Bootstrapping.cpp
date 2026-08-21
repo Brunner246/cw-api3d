@@ -24,6 +24,38 @@ namespace cw_api3d::composition
       return ports::LogLevel::Info;
 #endif
     }
+
+    [[nodiscard]] std::shared_ptr<adapters::driven::logging::SpdLogLogger> makeProductionLogger()
+    {
+      auto logger = std::make_shared<adapters::driven::logging::SpdLogLogger>();
+      logger->setLevel(defaultLogLevel());
+      return logger;
+    }
+
+    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DUtilityController* resolveUtilityController(
+      CwAPI3D::ControllerFactory* factory,
+      ports::interfaces::ILogger& logger) noexcept
+    {
+      if (factory == nullptr)
+      {
+        logger.warn("Null CwAPI3D ControllerFactory provided during bootstrapping");
+        return nullptr;
+      }
+
+      try
+      {
+        return factory->getUtilityController();
+      }
+      catch (const std::exception& ex)
+      {
+        logger.errorf("Failed to retrieve utility controller from factory: {}", ex.what());
+      }
+      catch (...)
+      {
+        logger.error("Unknown exception while retrieving utility controller from factory");
+      }
+      return nullptr;
+    }
   } // namespace
 
   PluginBootstrapper::PluginBootstrapper(
@@ -40,35 +72,26 @@ namespace cw_api3d::composition
   {
     try
     {
-      auto logger = std::make_shared<adapters::driven::logging::SpdLogLogger>();
-      logger->setLevel(defaultLogLevel());
-
-      CwAPI3D::Interfaces::ICwAPI3DUtilityController* utilityCtrl = nullptr;
-      if (factory != nullptr)
-      {
-        try
-        {
-          utilityCtrl = factory->getUtilityController();
-        }
-        catch (const std::exception& ex)
-        {
-          logger->errorf("Failed to retrieve utility controller from factory: {}", ex.what());
-        }
-        catch (...)
-        {
-          logger->error("Unknown exception while retrieving utility controller from factory");
-        }
-      }
-      else
-      {
-        logger->warn("Null CwAPI3D ControllerFactory provided during bootstrapping");
-      }
+      auto logger = makeProductionLogger();
 
       auto utilityAdapter = std::make_shared<adapters::driven::cadwork::CadworkUtilityAdapter>(
-        utilityCtrl,
+        resolveUtilityController(factory, *logger),
         logger);
 
       return std::make_unique<PluginBootstrapper>(std::move(utilityAdapter), std::move(logger));
+    }
+    catch (...)
+    {
+      return nullptr;
+    }
+  }
+
+  std::unique_ptr<PluginBootstrapper> PluginBootstrapper::createProductionForUtilityProvider(
+    ports::interfaces::UtilityProviderPtr utilityProvider) noexcept
+  {
+    try
+    {
+      return std::make_unique<PluginBootstrapper>(std::move(utilityProvider), makeProductionLogger());
     }
     catch (...)
     {

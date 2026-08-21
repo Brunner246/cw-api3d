@@ -45,21 +45,19 @@ target_include_directories(SpdLogLoggerTests PRIVATE
 )
 target_compile_features(SpdLogLoggerTests PRIVATE cxx_std_23)
 
-# Cadwork Utility Driven Adapter Tests
-add_executable(CadworkUtilityAdapterTests
-    adapters/CadworkUtilityAdapterTests.cpp
+# Utility Controller Driven Adapter Tests (SDK-free: adapter is constrained on a concept)
+add_executable(UtilityControllerAdapterTests
+    adapters/UtilityControllerAdapterTests.cpp
 )
-target_link_libraries(CadworkUtilityAdapterTests PRIVATE
-    cw_api3d_cadwork_adapter
+target_link_libraries(UtilityControllerAdapterTests PRIVATE
     cw_api3d_ports
-    CwAPI3D::CwAPI3D
     GTest::gtest
     GTest::gtest_main
 )
-target_include_directories(CadworkUtilityAdapterTests PRIVATE
+target_include_directories(UtilityControllerAdapterTests PRIVATE
     ${CMAKE_SOURCE_DIR}
 )
-target_compile_features(CadworkUtilityAdapterTests PRIVATE cxx_std_23)
+target_compile_features(UtilityControllerAdapterTests PRIVATE cxx_std_23)
 
 # Composition Root Tests
 add_executable(CompositionRootTests
@@ -70,9 +68,6 @@ target_link_libraries(CompositionRootTests PRIVATE
     cw_api3d_ports
     cw_api3d_application
     cw_api3d_spdlog_adapter
-    cw_api3d_cadwork_adapter
-    CwAPI3D::CwAPI3D
-    spdlog::spdlog
     GTest::gtest
     GTest::gtest_main
 )
@@ -85,7 +80,7 @@ include(GoogleTest)
 gtest_discover_tests(PortConceptsTests)
 gtest_discover_tests(QueryPluginPathUseCaseTests)
 gtest_discover_tests(SpdLogLoggerTests)
-gtest_discover_tests(CadworkUtilityAdapterTests)
+gtest_discover_tests(UtilityControllerAdapterTests)
 gtest_discover_tests(CompositionRootTests)
 
 

@@ -81,12 +81,12 @@ Directly execute individual test binaries located under `out/build/<preset>/bin/
 ./out/build/local-relwithdebinfo/bin/relwithdebinfo/PortConceptsTests.exe
 ./out/build/local-relwithdebinfo/bin/relwithdebinfo/QueryPluginPathUseCaseTests.exe
 ./out/build/local-relwithdebinfo/bin/relwithdebinfo/SpdLogLoggerTests.exe
-./out/build/local-relwithdebinfo/bin/relwithdebinfo/CadworkUtilityAdapterTests.exe
+./out/build/local-relwithdebinfo/bin/relwithdebinfo/UtilityControllerAdapterTests.exe
 ./out/build/local-relwithdebinfo/bin/relwithdebinfo/CompositionRootTests.exe
 ```
 Filter individual test cases using GoogleTest filter flags:
 ```bash
-./out/build/local-relwithdebinfo/bin/relwithdebinfo/CompositionRootTests.exe --gtest_filter=CompositionRootTests.ProductionBootstrapperWithStubFactorySuccess
+./out/build/local-relwithdebinfo/bin/relwithdebinfo/CompositionRootTests.exe --gtest_filter=CompositionRootTests.ProductionBootstrapperResolvesPathFromProvider
 ```
 
 ---

@@ -1,6 +1,7 @@
 add_library(cw_api3d_cadwork_adapter
         CadworkUtilityAdapter.cpp
         CadworkUtilityAdapter.h
+        UtilityControllerAdapter.h
 )
 
 target_include_directories(cw_api3d_cadwork_adapter PUBLIC
@@ -10,7 +11,7 @@ target_include_directories(cw_api3d_cadwork_adapter PUBLIC
 
 target_link_libraries(cw_api3d_cadwork_adapter
         PUBLIC cw_api3d_ports
-        PRIVATE CwAPI3D::CwAPI3D
+        PUBLIC CwAPI3D::CwAPI3D
 )
 
 target_compile_features(cw_api3d_cadwork_adapter PUBLIC cxx_std_23)
