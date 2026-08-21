@@ -23,17 +23,26 @@ For detailed instructions on building and running the test suites, see [tests/RE
 
 ### Quick Commands
 
-#### 1. C++ Unit Tests (CTest)
+Invoke wraps CMake / CTest / pytest and loads MSVC toolset 14.44 automatically. Default preset is `local-relwithdebinfo`.
+
 ```powershell
-cmd.exe /c "call ""C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"" -vcvars_ver=14.44 && cmake --preset local-relwithdebinfo && cmake --build out/build/local-relwithdebinfo && ctest --test-dir out/build/local-relwithdebinfo --output-on-failure"
+uv sync
+uv run invoke --list
+uv run invoke build
+uv run invoke test
+uv run invoke e2e
 ```
 
-#### 2. Python E2E Tests (uv / pytest)
-```bash
-# Sync environment & run tests
-uv sync
-uv run pytest -v
+```powershell
+uv run invoke build --preset local-debug
+uv run invoke test --filter CompositionRoot
+uv run invoke e2e --host-only          # path/staging tests, no cadwork launch
+uv run invoke e2e --no-build           # skip the C++ rebuild
+uv run invoke e2e --args "-k test_cadwork_paths_resolution"
+uv run invoke rebuild
 ```
+
+See [tests/README.md](tests/README.md) for the underlying cmake / ctest / pytest commands.
 
 ---
 

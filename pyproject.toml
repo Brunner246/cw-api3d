@@ -5,6 +5,7 @@ description = "cadwork 3D C++ API plugin with Python E2E test harness"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "invoke>=3.0.3",
     "pytest>=8.0.0",
 ]
 
