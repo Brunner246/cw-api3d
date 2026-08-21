@@ -1,36 +1,18 @@
 #pragma once
 
-#include "src/ports/Logger.h"
-#include "src/ports/UtilityProvider.h"
+#include "src/adapters/driven/cadwork/UtilityControllerAdapter.h"
 
-#include <filesystem>
-#include <optional>
-
-namespace CwAPI3D::Interfaces
-{
-  class ICwAPI3DUtilityController;
-}
+#include <cwapi3d/ICwAPI3DString.h>
+#include <cwapi3d/ICwAPI3DUtilityController.h>
 
 namespace cw_api3d::adapters::driven::cadwork
 {
 
-  /// @brief Driven adapter wrapping CwAPI3D::Interfaces::ICwAPI3DUtilityController.
-  /// Satisfies cw_api3d::ports::concepts::UtilityProvider and implements cw_api3d::ports::interfaces::IUtilityProvider.
-  /// Safely extracts plugin path string data without calling destroy() on host-owned strings.
-  class CadworkUtilityAdapter : public ports::interfaces::IUtilityProvider
-  {
-  public:
-    explicit CadworkUtilityAdapter(
-      CwAPI3D::Interfaces::ICwAPI3DUtilityController* utilityController = nullptr,
-      ports::interfaces::LoggerPtr logger = nullptr) noexcept;
+  /// @brief Production instantiation of UtilityControllerAdapter against the cadwork host interface.
+  /// This header is the single point where the adapter layer names a CwAPI3D type; the translation
+  /// logic itself lives in UtilityControllerAdapter.h and is SDK-free.
+  using CadworkUtilityAdapter = UtilityControllerAdapter<CwAPI3D::Interfaces::ICwAPI3DUtilityController>;
 
-    ~CadworkUtilityAdapter() override = default;
-
-    [[nodiscard]] std::optional<std::filesystem::path> getPluginPath() const noexcept override;
-
-  private:
-    CwAPI3D::Interfaces::ICwAPI3DUtilityController* mUtilityController{nullptr};
-    ports::interfaces::LoggerPtr mLogger;
-  };
+  extern template class UtilityControllerAdapter<CwAPI3D::Interfaces::ICwAPI3DUtilityController>;
 
 } // namespace cw_api3d::adapters::driven::cadwork
