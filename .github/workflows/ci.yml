@@ -1,0 +1,126 @@
+name: CI / CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'fix/**'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & Test (${{ matrix.build_type }})
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release, Debug]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup MSVC Developer Environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Setup vcpkg environment
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/.vcpkg_cache"
+          echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" >> $env:GITHUB_ENV
+          echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/.vcpkg_cache" >> $env:GITHUB_ENV
+
+      - name: Restore / Save vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.vcpkg_cache
+          key: vcpkg-${{ runner.os }}-${{ matrix.build_type }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-${{ matrix.build_type }}-
+            vcpkg-${{ runner.os }}-
+
+      - name: Setup Python & uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake --preset msvc-${{ matrix.build_type == 'Release' && 'release' || 'debug' }}
+
+      - name: Build C++ Targets
+        shell: pwsh
+        run: |
+          cmake --build --preset ${{ matrix.build_type == 'Release' && 'release' || 'debug' }} --parallel
+
+      - name: Run C++ Unit & Integration Tests (CTest)
+        shell: pwsh
+        run: |
+          ctest --preset ${{ matrix.build_type == 'Release' && 'release' || 'debug' }} --output-on-failure
+
+      - name: Run Python Unit Tests (Pytest via uv)
+        shell: pwsh
+        run: |
+          uv sync
+          uv run pytest -v
+
+      - name: Upload Plugin Artifacts
+        if: matrix.build_type == 'Release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cw_api3d-windows-x64-release
+          path: |
+            out/build/msvc-release/bin/release/cw_api3d.dll
+            out/build/msvc-release/bin/release/cw_api3d.lib
+            out/build/msvc-release/lib/release/*.lib
+          if-no-files-found: warn
+
+  release:
+    name: Publish GitHub Release
+    needs: build-and-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Release Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: cw_api3d-windows-x64-release
+          path: release-artifacts
+
+      - name: Create ZIP Archive
+        run: |
+          cd release-artifacts
+          zip -r ../cw_api3d-windows-x64.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: cw_api3d-windows-x64.zip
+          generate_release_notes: true

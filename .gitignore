@@ -10,6 +10,7 @@ build/
 CMakeUserPresets.json
 .cw-userprofile
 vcpkg_installed/
+.vcpkg_cache/
 
 # Python & UV
 .venv/
