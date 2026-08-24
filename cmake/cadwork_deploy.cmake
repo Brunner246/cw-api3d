@@ -82,11 +82,12 @@ function(cadwork_add_post_build_deploy target_name)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "$<TARGET_FILE:${target_name}>"
                 "${_deploy_dir}/$<TARGET_FILE_NAME:${target_name}>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "$<TARGET_RUNTIME_DLLS:${target_name}>"
-                "${_deploy_dir}"
+        COMMAND ${CMAKE_COMMAND}
+                "-DDEST_DIR=${_deploy_dir}"
+                "-DFILES=$<TARGET_RUNTIME_DLLS:${target_name}>"
+                -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/copy_non_qt_runtime_dlls.cmake"
         COMMAND_EXPAND_LISTS
-        COMMENT "Deploying ${target_name} and runtime DLLs to ${_deploy_dir}"
+        COMMENT "Deploying ${target_name} and non-Qt runtime DLLs to ${_deploy_dir}"
         VERBATIM
     )
 

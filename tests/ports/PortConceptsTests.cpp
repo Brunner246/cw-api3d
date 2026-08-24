@@ -1,9 +1,15 @@
 #include <gtest/gtest.h>
 
+#include "src/ports/ElementActivation.h"
+#include "src/ports/ElementCatalog.h"
 #include "src/ports/Logger.h"
 #include "src/ports/UtilityProvider.h"
+#include "tests/doubles/FakeElementActivation.h"
+#include "tests/doubles/FakeElementCatalog.h"
 #include "tests/doubles/FakeLogger.h"
 #include "tests/doubles/FakeUtilityProvider.h"
+
+#include <vector>
 
 using namespace cw_api3d::ports;
 using namespace cw_api3d::tests::doubles;
@@ -11,8 +17,12 @@ using namespace cw_api3d::tests::doubles;
 // Compile-time static assertions for C++20 concepts
 static_assert(concepts::Logger<FakeLogger>, "FakeLogger must satisfy concepts::Logger");
 static_assert(concepts::UtilityProvider<FakeUtilityProvider>, "FakeUtilityProvider must satisfy concepts::UtilityProvider");
+static_assert(concepts::ElementCatalog<FakeElementCatalog>, "FakeElementCatalog must satisfy concepts::ElementCatalog");
+static_assert(concepts::ElementActivation<FakeElementActivation>, "FakeElementActivation must satisfy concepts::ElementActivation");
 static_assert(std::derived_from<FakeLogger, interfaces::ILogger>, "FakeLogger must derive from ILogger");
 static_assert(std::derived_from<FakeUtilityProvider, interfaces::IUtilityProvider>, "FakeUtilityProvider must derive from IUtilityProvider");
+static_assert(std::derived_from<FakeElementCatalog, interfaces::IElementCatalog>, "FakeElementCatalog must derive from IElementCatalog");
+static_assert(std::derived_from<FakeElementActivation, interfaces::IElementActivation>, "FakeElementActivation must derive from IElementActivation");
 
 TEST(PortConceptsTests, ParseLogLevelCaseInsensitive)
 {
@@ -84,6 +94,31 @@ TEST(PortConceptsTests, FakeUtilityProviderReturnsConfiguredPath)
   auto result = provider.getPluginPath();
   ASSERT_TRUE(result.has_value());
   EXPECT_EQ(*result, testPath);
+}
+
+TEST(PortConceptsTests, FakeElementCatalogReturnsConfiguredSnapshot)
+{
+  FakeElementCatalog catalog;
+  cw_api3d::application::ElementSnapshot snapshot;
+  snapshot.records.push_back(cw_api3d::application::ElementRecord{.id = 7});
+  catalog.setActive(snapshot);
+
+  const auto result = catalog.fetch(cw_api3d::application::ElementUniverse::Active);
+
+  ASSERT_TRUE(result.has_value());
+  ASSERT_EQ(result->records.size(), 1u);
+  EXPECT_EQ(result->records.front().id, 7u);
+}
+
+TEST(PortConceptsTests, FakeElementActivationRecordsIds)
+{
+  FakeElementActivation activation;
+  const std::vector<cw_api3d::application::ElementId> ids{3, 5};
+
+  const auto result = activation.activate(ids);
+
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(activation.lastIds(), ids);
 }
 
 TEST(PortConceptsTests, DynamicPolymorphismViaInterfaces)

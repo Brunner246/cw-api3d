@@ -2,6 +2,12 @@ add_library(cw_api3d_cadwork_adapter
         CadworkUtilityAdapter.cpp
         CadworkUtilityAdapter.h
         UtilityControllerAdapter.h
+        CadworkElementCatalogAdapter.cpp
+        CadworkElementCatalogAdapter.h
+        ElementCatalogAdapter.h
+        CadworkElementActivationAdapter.cpp
+        CadworkElementActivationAdapter.h
+        ElementActivationAdapter.h
 )
 
 target_include_directories(cw_api3d_cadwork_adapter PUBLIC

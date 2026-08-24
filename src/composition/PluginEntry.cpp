@@ -1,4 +1,7 @@
 #include "src/composition/Bootstrapping.h"
+#ifdef CW_API3D_HAS_DRIVING
+#include "src/composition/StatisticsPanelWiring.h"
+#endif
 
 #ifndef CWAPI3D_PLUGIN_NAME
 #define CWAPI3D_PLUGIN_NAME L"cw_api3d"
@@ -19,12 +22,30 @@
 /// '<Return> to continue' host modal.
 CWAPI3D_PLUGIN bool plugin_x64_init(CwAPI3D::ControllerFactory* aFactory)
 {
-  [[maybe_unused]] const bool success = cw_api3d::composition::bootstrapPlugin(aFactory);
+  try
+  {
+#ifdef CW_API3D_HAS_DRIVING
+    cw_api3d::composition::registerStatisticsPanelFactory();
+#endif
+    [[maybe_unused]] const bool success = cw_api3d::composition::bootstrapPlugin(aFactory);
+  }
+  catch (...)
+  {
+  }
   return false;
 }
 
 CWAPI3D_PLUGIN bool init_cwapi3d(CwAPI3D::ControllerFactory* aFactory)
 {
-  [[maybe_unused]] const bool success = cw_api3d::composition::bootstrapPlugin(aFactory);
+  try
+  {
+#ifdef CW_API3D_HAS_DRIVING
+    cw_api3d::composition::registerStatisticsPanelFactory();
+#endif
+    [[maybe_unused]] const bool success = cw_api3d::composition::bootstrapPlugin(aFactory);
+  }
+  catch (...)
+  {
+  }
   return false;
 }

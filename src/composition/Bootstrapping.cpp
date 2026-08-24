@@ -2,6 +2,7 @@
 
 #include "src/adapters/driven/cadwork/CadworkUtilityAdapter.h"
 #include "src/adapters/driven/logging/SpdLogLogger.h"
+#include "src/composition/PluginUiSession.h"
 #include <cwapi3d/ICwAPI3DControllerFactory.h>
 #include <cwapi3d/ICwAPI3DUtilityController.h>
 
@@ -135,6 +136,7 @@ namespace cw_api3d::composition
 
   bool bootstrapPlugin(CwAPI3D::ControllerFactory* factory) noexcept
   {
+    ports::interfaces::LoggerPtr logger;
     try
     {
       const auto bootstrapper = PluginBootstrapper::createProduction(factory);
@@ -143,11 +145,26 @@ namespace cw_api3d::composition
         return false;
       }
 
+      logger = bootstrapper->logger();
       const auto result = bootstrapper->run();
+      PluginUiSession::instance().setLogger(logger);
+      PluginUiSession::instance().showOrFocus(factory);
       return result.has_value();
+    }
+    catch (const std::exception& ex)
+    {
+      if (logger)
+      {
+        logger->errorf("Unhandled exception during plugin bootstrap: {}", ex.what());
+      }
+      return false;
     }
     catch (...)
     {
+      if (logger)
+      {
+        logger->error("Unknown unhandled exception during plugin bootstrap");
+      }
       return false;
     }
   }

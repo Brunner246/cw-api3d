@@ -1,6 +1,9 @@
 add_library(cw_api3d_composition STATIC
         Bootstrapping.cpp
         Bootstrapping.h
+        IStatisticsPanel.h
+        PluginUiSession.cpp
+        PluginUiSession.h
 )
 
 target_link_libraries(cw_api3d_composition PUBLIC
@@ -38,5 +41,18 @@ target_compile_definitions(cw_api3d PRIVATE
         CWAPI3D_AUTHOR_NAME=L"michael.brunner"
         CWAPI3D_AUTHOR_EMAIL=L"michael.brunner@cadwork.ch"
 )
+
+if(TARGET cw_api3d_driving)
+    target_sources(cw_api3d PRIVATE
+            StatisticsPanelWiring.cpp
+            StatisticsPanelWiring.h
+    )
+    target_link_libraries(cw_api3d PRIVATE
+            cw_api3d_driving
+    )
+    target_compile_definitions(cw_api3d PRIVATE
+            CW_API3D_HAS_DRIVING
+    )
+endif()
 
 cadwork_add_post_build_deploy(cw_api3d)
