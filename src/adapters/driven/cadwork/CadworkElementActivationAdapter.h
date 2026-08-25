@@ -13,12 +13,12 @@ namespace cw_api3d::adapters::driven::cadwork
     CwAPI3D::Interfaces::ICwAPI3DControllerFactory* factory{nullptr};
     CwAPI3D::Interfaces::ICwAPI3DVisualizationController* visualization{nullptr};
 
-    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DElementIDList* createEmptyElementIDList()
+    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DElementIDList* createEmptyElementIDList() const
     {
       return factory ? factory->createEmptyElementIDList() : nullptr;
     }
 
-    void setActive(CwAPI3D::Interfaces::ICwAPI3DElementIDList* list)
+    void setActive(CwAPI3D::Interfaces::ICwAPI3DElementIDList* list) const
     {
       if (visualization)
       {

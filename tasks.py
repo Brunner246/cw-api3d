@@ -173,8 +173,19 @@ def _configure(c: Context, preset: str) -> None:
     _run(c, f"cmake --preset {_validated_preset(preset)}", env=_msvc_env())
 
 
+def _ninja_graph_complete(preset: str) -> bool:
+    build_dir = _build_dir(preset)
+    return (
+        (build_dir / "CMakeCache.txt").is_file()
+        and (build_dir / "build.ninja").is_file()
+        and (build_dir / "CMakeFiles" / "rules.ninja").is_file()
+    )
+
+
 def _ensure_configured(c: Context, preset: str) -> None:
-    if not (_build_dir(preset) / "CMakeCache.txt").is_file():
+    # A CMakeCache.txt can survive a failed CLion/CMake reconfigure that
+    # deleted CMakeFiles/rules.ninja. Ninja then dies on `include rules.ninja`.
+    if not _ninja_graph_complete(preset):
         _configure(c, preset)
 
 

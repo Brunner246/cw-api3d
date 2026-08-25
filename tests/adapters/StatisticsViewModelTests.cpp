@@ -243,6 +243,29 @@ TEST(StatisticsViewModelTests, EmptyAttributeDisplayRoleIsNonEmptyTrLabel)
   EXPECT_EQ(harness.viewModel.buckets()->memberIdsAt(emptyRow), std::vector<ElementId>{38});
 }
 
+TEST(StatisticsViewModelTests, UmlautLabelsSurviveUtf8ToQString)
+{
+  ViewModelHarness harness;
+  ElementSnapshot snapshot;
+  snapshot.records.push_back(ElementRecord{
+    .id = 1,
+    .kind = ElementKind::Opening,
+    .kindLabel = "Öffnung",
+    .name = "Überzug",
+    .material = "Grün"});
+  harness.catalog.setActive(snapshot);
+
+  harness.fetchAndWait();
+
+  EXPECT_EQ(labelAt(*harness.viewModel.buckets(), 0), QString::fromUtf8("Öffnung"));
+
+  harness.viewModel.setAxis(StatisticsViewModel::Axis::Material);
+  EXPECT_EQ(labelAt(*harness.viewModel.buckets(), 0), QString::fromUtf8("Grün"));
+
+  harness.viewModel.setAxis(StatisticsViewModel::Axis::Name);
+  EXPECT_EQ(labelAt(*harness.viewModel.buckets(), 0), QString::fromUtf8("Überzug"));
+}
+
 TEST(StatisticsViewModelTests, DimensionLabelsUsePinnedGermanLocaleAndUnitSuffix)
 {
   ViewModelHarness harness;

@@ -15,7 +15,8 @@ class QTableView;
 namespace cw_api3d::adapters::driving
 {
 
-  class StatisticsDockWidget final : public QDockWidget, public composition::IStatisticsPanel
+  class StatisticsDockWidget final : public QDockWidget
+    , public composition::IStatisticsPanel
   {
     Q_OBJECT
 

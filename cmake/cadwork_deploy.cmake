@@ -85,9 +85,10 @@ function(cadwork_add_post_build_deploy target_name)
         COMMAND ${CMAKE_COMMAND}
                 "-DDEST_DIR=${_deploy_dir}"
                 "-DFILES=$<TARGET_RUNTIME_DLLS:${target_name}>"
+                "-DQT_BIN_DIR=${CUSTOM_QT_PATH}/bin"
                 -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/copy_non_qt_runtime_dlls.cmake"
         COMMAND_EXPAND_LISTS
-        COMMENT "Deploying ${target_name} and non-Qt runtime DLLs to ${_deploy_dir}"
+        COMMENT "Deploying ${target_name} and host-absent runtime DLLs to ${_deploy_dir}"
         VERBATIM
     )
 

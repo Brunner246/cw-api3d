@@ -15,57 +15,57 @@ namespace cw_api3d::adapters::driven::cadwork
     CwAPI3D::Interfaces::ICwAPI3DAttributeController* attributes{nullptr};
     CwAPI3D::Interfaces::ICwAPI3DGeometryController* geometry{nullptr};
 
-    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DElementIDList* getActiveIdentifiableElementIDs()
+    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DElementIDList* getActiveIdentifiableElementIDs() const
     {
       return elements ? elements->getActiveIdentifiableElementIDs() : nullptr;
     }
 
-    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DElementIDList* getAllIdentifiableElementIDs()
+    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DElementIDList* getAllIdentifiableElementIDs() const
     {
       return elements ? elements->getAllIdentifiableElementIDs() : nullptr;
     }
 
-    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DString* getName(const CwAPI3D::elementID id)
+    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DString* getName(const CwAPI3D::elementID id) const
     {
       return attributes ? attributes->getName(id) : nullptr;
     }
 
-    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DString* getElementMaterialName(const CwAPI3D::elementID id)
+    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DString* getElementMaterialName(const CwAPI3D::elementID id) const
     {
       return attributes ? attributes->getElementMaterialName(id) : nullptr;
     }
 
-    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DString* getElementTypeDescription(const CwAPI3D::elementID id)
+    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DString* getElementTypeDescription(const CwAPI3D::elementID id) const
     {
       return elements ? elements->getElementTypeDescription(id) : nullptr;
     }
 
-    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DElementType* getElementType(const CwAPI3D::elementID id)
+    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DElementType* getElementType(const CwAPI3D::elementID id) const
     {
       return attributes ? attributes->getElementType(id) : nullptr;
     }
 
-    [[nodiscard]] bool isBeam(const CwAPI3D::elementID id)
+    [[nodiscard]] bool isBeam(const CwAPI3D::elementID id) const
     {
       return attributes && attributes->isBeam(id);
     }
 
-    [[nodiscard]] double getLength(const CwAPI3D::elementID id)
+    [[nodiscard]] double getLength(const CwAPI3D::elementID id) const
     {
       return geometry ? geometry->getLength(id) : 0.0;
     }
 
-    [[nodiscard]] double getWidth(const CwAPI3D::elementID id)
+    [[nodiscard]] double getWidth(const CwAPI3D::elementID id) const
     {
       return geometry ? geometry->getWidth(id) : 0.0;
     }
 
-    [[nodiscard]] double getHeight(const CwAPI3D::elementID id)
+    [[nodiscard]] double getHeight(const CwAPI3D::elementID id) const
     {
       return geometry ? geometry->getHeight(id) : 0.0;
     }
 
-    [[nodiscard]] double getVolume(const CwAPI3D::elementID id)
+    [[nodiscard]] double getVolume(const CwAPI3D::elementID id) const
     {
       return geometry ? geometry->getVolume(id) : 0.0;
     }

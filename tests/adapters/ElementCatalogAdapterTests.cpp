@@ -129,3 +129,57 @@ TEST(ElementCatalogAdapterTests, HostExceptionIsUnexpected)
   ASSERT_FALSE(result.has_value());
   EXPECT_TRUE(fakeLogger->hasMessage(LogLevel::Error, "Exception fetching snapshot"));
 }
+
+TEST(ElementCatalogAdapterTests, CopyHostStringUsesWideDataNotNarrowAcp)
+{
+  FakeHostString hostString;
+  hostString.setNarrow("\xE4\xF6\xFC");
+  hostString.setWide(L"äöüÄÖÜß");
+
+  const auto copied = cw_api3d::adapters::driven::cadwork::detail::copyHostString(&hostString);
+
+  EXPECT_EQ(copied, "äöüÄÖÜß");
+}
+
+TEST(ElementCatalogAdapterTests, CopyHostStringTrimsWideWhitespaceAroundUmlauts)
+{
+  FakeHostString hostString;
+  hostString.setWide(L"  Öffnung \t");
+
+  const auto copied = cw_api3d::adapters::driven::cadwork::detail::copyHostString(&hostString);
+
+  EXPECT_EQ(copied, "Öffnung");
+}
+
+TEST(ElementCatalogAdapterTests, CopyHostStringNullDataIsEmpty)
+{
+  FakeHostString hostString;
+  hostString.setWide(L"Grün");
+  hostString.setReturnNullData(true);
+
+  const auto copied = cw_api3d::adapters::driven::cadwork::detail::copyHostString(&hostString);
+
+  EXPECT_TRUE(copied.empty());
+}
+
+TEST(ElementCatalogAdapterTests, CopiesWideUmlautAttributesIntoSnapshot)
+{
+  FakeHostElementCatalog host;
+  ElementSnapshot snapshot;
+  snapshot.records.push_back(ElementRecord{
+    .id = 1,
+    .kind = ElementKind::Opening,
+    .kindLabel = "Öffnung",
+    .name = "Überzug",
+    .material = "Grün"});
+  host.setAll(snapshot);
+  const FakeAdapter adapter(&host);
+
+  const auto result = adapter.fetch(ElementUniverse::All);
+
+  ASSERT_TRUE(result.has_value());
+  ASSERT_EQ(result->records.size(), 1u);
+  EXPECT_EQ(result->records.front().name, "Überzug");
+  EXPECT_EQ(result->records.front().material, "Grün");
+  EXPECT_EQ(result->records.front().kindLabel, "Öffnung");
+}

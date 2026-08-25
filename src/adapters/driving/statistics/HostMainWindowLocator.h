@@ -25,7 +25,7 @@ namespace cw_api3d::adapters::driving
     return findMainWindow(QWidget::find(windowId));
   }
 
-  [[nodiscard]] inline bool shouldSkipStatisticsUi(QCoreApplication* instance) noexcept
+  [[nodiscard]] inline bool shouldSkipStatisticsUi(const QCoreApplication* instance) noexcept
   {
     return instance == nullptr;
   }

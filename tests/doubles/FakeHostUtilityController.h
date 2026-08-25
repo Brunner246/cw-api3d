@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cstddef>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace cw_api3d::tests::doubles
@@ -12,9 +14,15 @@ namespace cw_api3d::tests::doubles
   class FakeHostString final
   {
   public:
-    explicit FakeHostString(std::string narrow = "") noexcept
+    explicit FakeHostString(std::string narrow = "")
       : mNarrow(std::move(narrow))
+      , mWide(wideFromUtf8(mNarrow))
     {
+    }
+
+    const wchar_t* data() noexcept
+    {
+      return mReturnNullData ? nullptr : mWide.c_str();
     }
 
     const char* narrowData() noexcept
@@ -30,6 +38,17 @@ namespace cw_api3d::tests::doubles
     void setNarrow(std::string narrow)
     {
       mNarrow = std::move(narrow);
+      mWide = wideFromUtf8(mNarrow);
+    }
+
+    void setWide(std::wstring wide)
+    {
+      mWide = std::move(wide);
+    }
+
+    void setReturnNullData(const bool returnNull) noexcept
+    {
+      mReturnNullData = returnNull;
     }
 
     void setReturnNullNarrowData(const bool returnNull) noexcept
@@ -43,7 +62,63 @@ namespace cw_api3d::tests::doubles
     }
 
   private:
+    [[nodiscard]] static std::wstring wideFromUtf8(const std::string_view utf8)
+    {
+      std::wstring wide;
+      std::size_t index = 0;
+      while (index < utf8.size())
+      {
+        const auto lead = static_cast<unsigned char>(utf8[index]);
+        char32_t codePoint = 0;
+        std::size_t need = 1;
+        if (lead < 0x80)
+        {
+          codePoint = lead;
+        }
+        else if ((lead & 0xE0) == 0xC0)
+        {
+          need = 2;
+          codePoint = lead & 0x1F;
+        }
+        else if ((lead & 0xF0) == 0xE0)
+        {
+          need = 3;
+          codePoint = lead & 0x0F;
+        }
+        else if ((lead & 0xF8) == 0xF0)
+        {
+          need = 4;
+          codePoint = lead & 0x07;
+        }
+        else
+        {
+          ++index;
+          continue;
+        }
+        if (index + need > utf8.size())
+        {
+          break;
+        }
+        for (std::size_t offset = 1; offset < need; ++offset)
+        {
+          codePoint = (codePoint << 6) | (static_cast<unsigned char>(utf8[index + offset]) & 0x3F);
+        }
+        index += need;
+        if (codePoint <= 0xFFFF)
+        {
+          wide.push_back(static_cast<wchar_t>(codePoint));
+          continue;
+        }
+        const auto payload = codePoint - 0x10000;
+        wide.push_back(static_cast<wchar_t>(0xD800 + (payload >> 10)));
+        wide.push_back(static_cast<wchar_t>(0xDC00 + (payload & 0x3FF)));
+      }
+      return wide;
+    }
+
     std::string mNarrow;
+    std::wstring mWide;
+    bool mReturnNullData{false};
     bool mReturnNullNarrowData{false};
     bool mDestroyCalled{false};
   };
@@ -62,7 +137,7 @@ namespace cw_api3d::tests::doubles
     };
 
     FakeHostUtilityController() = default;
-    explicit FakeHostUtilityController(std::string pluginPath) noexcept
+    explicit FakeHostUtilityController(std::string pluginPath)
       : mString(std::move(pluginPath))
     {
     }

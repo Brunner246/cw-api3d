@@ -27,10 +27,7 @@ public:
     , activateUseCase(activation, logger)
     , viewModel(fetchUseCase, activateUseCase, []() { return false; })
   {
-    catalog.setActive(activeSnapshot());
-    catalog.setAll(allSnapshot());
-    viewModel.fetch();
-    QCoreApplication::processEvents();
+    restoreDefaultFixture();
   }
 
 public slots:
@@ -38,6 +35,35 @@ public slots:
   {
     engine->addImportPath(QStringLiteral("qrc:/qt/qml"));
     engine->rootContext()->setContextProperty(QStringLiteral("viewModel"), &viewModel);
+    engine->rootContext()->setContextProperty(QStringLiteral("testSetup"), this);
+  }
+
+  void loadUmlautFixture()
+  {
+    ElementSnapshot snapshot;
+    snapshot.records.push_back(ElementRecord{
+      .id = 1,
+      .kind = ElementKind::Opening,
+      .kindLabel = "Öffnung",
+      .name = "Überzug",
+      .material = "Grün"});
+    catalog.setActive(snapshot);
+    viewModel.setUniverse(StatisticsViewModel::Universe::Active);
+    viewModel.setAxis(StatisticsViewModel::Axis::Type);
+    viewModel.setChartKind(StatisticsViewModel::ChartKind::Bar);
+    viewModel.fetch();
+    QCoreApplication::processEvents();
+  }
+
+  void restoreDefaultFixture()
+  {
+    catalog.setActive(activeSnapshot());
+    catalog.setAll(allSnapshot());
+    viewModel.setUniverse(StatisticsViewModel::Universe::Active);
+    viewModel.setAxis(StatisticsViewModel::Axis::Type);
+    viewModel.setChartKind(StatisticsViewModel::ChartKind::Bar);
+    viewModel.fetch();
+    QCoreApplication::processEvents();
   }
 
 private:

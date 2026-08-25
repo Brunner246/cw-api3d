@@ -1,4 +1,5 @@
 #include "src/adapters/driving/statistics/BucketListModel.h"
+#include "src/adapters/driving/statistics/CategoricalPalette.h"
 
 namespace cw_api3d::adapters::driving
 {
@@ -44,6 +45,8 @@ namespace cw_api3d::adapters::driving
           return 0.0;
         }
         return static_cast<double>(bucket.count) / static_cast<double>(mTotalCount);
+      case ColorRole:
+        return CategoricalPalette::colorAt(row);
       default:
         return {};
     }
@@ -55,6 +58,7 @@ namespace cw_api3d::adapters::driving
       {LabelRole, QByteArrayLiteral("label")},
       {CountRole, QByteArrayLiteral("count")},
       {ShareRole, QByteArrayLiteral("share")},
+      {ColorRole, QByteArrayLiteral("color")},
     };
   }
 
@@ -87,6 +91,11 @@ namespace cw_api3d::adapters::driving
   int BucketListModel::countAt(const int row) const
   {
     return data(index(row, 0), CountRole).toInt();
+  }
+
+  QColor BucketListModel::colorAt(const int row) const
+  {
+    return data(index(row, 0), ColorRole).value<QColor>();
   }
 
 } // namespace cw_api3d::adapters::driving

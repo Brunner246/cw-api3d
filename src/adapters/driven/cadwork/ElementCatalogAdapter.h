@@ -23,7 +23,7 @@ namespace cw_api3d::adapters::driven::cadwork
 
     template<typename T>
     concept HostString = requires(T& hostString) {
-      { hostString.narrowData() } -> std::convertible_to<const char*>;
+      { hostString.data() } -> std::convertible_to<const wchar_t*>;
     };
 
     template<typename T>
@@ -89,18 +89,79 @@ namespace cw_api3d::adapters::driven::cadwork
       return text;
     }
 
+    inline void appendUtf8CodePoint(std::string& out, const char32_t codePoint)
+    {
+      if (codePoint < 0x80)
+      {
+        out.push_back(static_cast<char>(codePoint));
+        return;
+      }
+      if (codePoint < 0x800)
+      {
+        out.push_back(static_cast<char>(0xC0 | (codePoint >> 6)));
+        out.push_back(static_cast<char>(0x80 | (codePoint & 0x3F)));
+        return;
+      }
+      if (codePoint < 0x10000)
+      {
+        out.push_back(static_cast<char>(0xE0 | (codePoint >> 12)));
+        out.push_back(static_cast<char>(0x80 | ((codePoint >> 6) & 0x3F)));
+        out.push_back(static_cast<char>(0x80 | (codePoint & 0x3F)));
+        return;
+      }
+      out.push_back(static_cast<char>(0xF0 | (codePoint >> 18)));
+      out.push_back(static_cast<char>(0x80 | ((codePoint >> 12) & 0x3F)));
+      out.push_back(static_cast<char>(0x80 | ((codePoint >> 6) & 0x3F)));
+      out.push_back(static_cast<char>(0x80 | (codePoint & 0x3F)));
+    }
+
+    [[nodiscard]] inline std::string utf8FromWide(const wchar_t* wide)
+    {
+      if (wide == nullptr)
+      {
+        return {};
+      }
+
+      std::string utf8;
+      while (*wide != L'\0')
+      {
+        auto unit = static_cast<char32_t>(*wide++);
+        if (unit >= 0xD800 && unit <= 0xDBFF)
+        {
+          if (*wide == L'\0')
+          {
+            break;
+          }
+          const auto low = static_cast<char32_t>(*wide);
+          if (low < 0xDC00 || low > 0xDFFF)
+          {
+            continue;
+          }
+          ++wide;
+          unit = 0x10000 + ((unit - 0xD800) << 10) + (low - 0xDC00);
+        }
+        else if (unit >= 0xDC00 && unit <= 0xDFFF)
+        {
+          continue;
+        }
+        appendUtf8CodePoint(utf8, unit);
+      }
+      return utf8;
+    }
+
     [[nodiscard]] inline std::string copyHostString(auto* hostString)
     {
       if (!hostString)
       {
         return {};
       }
-      const auto* narrow = hostString->narrowData();
-      if (!narrow)
+      // narrowData() is the host ACP, not UTF-8. Domain strings and Qt 6 fromStdString are UTF-8.
+      const auto* wide = hostString->data();
+      if (!wide)
       {
         return {};
       }
-      return std::string{trimWhitespace(std::string_view(narrow))};
+      return std::string{trimWhitespace(utf8FromWide(wide))};
     }
 
     [[nodiscard]] inline std::optional<double> finiteOrNull(const double value) noexcept
@@ -139,10 +200,6 @@ namespace cw_api3d::adapters::driven::cadwork
       {
         return application::ElementKind::CircularBeam;
       }
-      if (isBeam)
-      {
-        return application::ElementKind::Beam;
-      }
       if (type.isPanel())
       {
         return application::ElementKind::Panel;
@@ -150,6 +207,10 @@ namespace cw_api3d::adapters::driven::cadwork
       if (type.isOpening())
       {
         return application::ElementKind::Opening;
+      }
+      if (isBeam)
+      {
+        return application::ElementKind::Beam;
       }
       return application::ElementKind::Other;
     }

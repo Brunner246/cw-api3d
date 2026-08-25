@@ -67,7 +67,7 @@ uv run invoke e2e
 | Task | What it runs |
 |------|----------------|
 | `configure` | `cmake --preset <preset>` |
-| `build` | configure if `out/build/<preset>/CMakeCache.txt` is missing, then `cmake --build out/build/<preset>` |
+| `build` | configure if the Ninja graph is missing (`CMakeCache.txt` / `build.ninja` / `CMakeFiles/rules.ninja`), then `cmake --build out/build/<preset>` |
 | `test` | `ctest --test-dir out/build/<preset> --output-on-failure --parallel` (builds first) |
 | `e2e` | `uv run pytest -v` (builds first so `cw_api3d.dll` is deployed) |
 | `clean` | deletes `out/build/<preset>` only |

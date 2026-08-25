@@ -4,6 +4,7 @@
 #include "src/application/StatisticSeries.h"
 
 #include <QAbstractListModel>
+#include <QColor>
 #include <QHash>
 #include <QString>
 #include <QVector>
@@ -22,7 +23,8 @@ namespace cw_api3d::adapters::driving
     {
       LabelRole = Qt::UserRole + 1,
       CountRole,
-      ShareRole
+      ShareRole,
+      ColorRole
     };
 
     explicit BucketListModel(QObject* parent = nullptr);
@@ -39,6 +41,7 @@ namespace cw_api3d::adapters::driving
     [[nodiscard]] std::vector<application::ElementId> memberIdsAt(int row) const;
     [[nodiscard]] Q_INVOKABLE QString labelAt(int row) const;
     [[nodiscard]] Q_INVOKABLE int countAt(int row) const;
+    [[nodiscard]] Q_INVOKABLE QColor colorAt(int row) const;
 
   private:
     std::vector<application::StatisticBucket> mBuckets;

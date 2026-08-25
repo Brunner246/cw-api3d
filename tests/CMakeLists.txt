@@ -76,6 +76,20 @@ target_include_directories(CompositionRootTests PRIVATE
 )
 target_compile_features(CompositionRootTests PRIVATE cxx_std_23)
 
+add_executable(HostAbsentQtRuntimeVisibilityTests
+    composition/HostAbsentQtRuntimeVisibilityTests.cpp
+)
+target_link_libraries(HostAbsentQtRuntimeVisibilityTests PRIVATE
+    cw_api3d_composition
+    cw_api3d_ports
+    GTest::gtest
+    GTest::gtest_main
+)
+target_include_directories(HostAbsentQtRuntimeVisibilityTests PRIVATE
+    ${CMAKE_SOURCE_DIR}
+)
+target_compile_features(HostAbsentQtRuntimeVisibilityTests PRIVATE cxx_std_23)
+
 # Producer verification fixtures (header-only; no Qt, no production ports)
 add_executable(ElementSnapshotFixturesTests
     fixtures/ElementSnapshotFixturesTests.cpp
@@ -177,6 +191,7 @@ gtest_discover_tests(UtilityControllerAdapterTests)
 gtest_discover_tests(CompositionRootTests
     DISCOVERY_MODE PRE_TEST
 )
+gtest_discover_tests(HostAbsentQtRuntimeVisibilityTests)
 gtest_discover_tests(ElementSnapshotFixturesTests)
 gtest_discover_tests(ContrastTokenPairsTests)
 gtest_discover_tests(ElementStatisticsAggregatorTests)
@@ -184,6 +199,14 @@ gtest_discover_tests(FetchElementSnapshotUseCaseTests)
 gtest_discover_tests(ActivateElementsUseCaseTests)
 gtest_discover_tests(ElementCatalogAdapterTests)
 gtest_discover_tests(ElementActivationAdapterTests)
+
+add_test(
+    NAME CopyNonQtRuntimeDllsTests.CopiesGraphsRuntimeClosureAndSkipsHostQtCore
+    COMMAND ${CMAKE_COMMAND}
+        "-DCOPY_SCRIPT=${CMAKE_SOURCE_DIR}/cmake/copy_non_qt_runtime_dlls.cmake"
+        "-DTEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/CopyNonQtRuntimeDllsTests"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CopyNonQtRuntimeDllsTests.cmake"
+)
 
 if(CUSTOM_QT_PATH)
     list(PREPEND CMAKE_PREFIX_PATH "${CUSTOM_QT_PATH}")
@@ -222,6 +245,27 @@ if(CUSTOM_QT_PATH)
         )
         target_compile_features(StatisticsViewModelTests PRIVATE cxx_std_23)
         gtest_discover_tests(StatisticsViewModelTests
+            WORKING_DIRECTORY "${CUSTOM_QT_PATH}/bin"
+            DISCOVERY_MODE PRE_TEST
+            PROPERTIES
+                ENVIRONMENT_MODIFICATION
+                    "${CW_API3D_QT_TEST_ENV}"
+        )
+
+        add_executable(CategoricalPaletteTests
+            adapters/CategoricalPaletteTests.cpp
+        )
+        target_link_libraries(CategoricalPaletteTests PRIVATE
+            cw_api3d_driving
+            Qt6::Core
+            Qt6::Gui
+            GTest::gtest
+        )
+        target_include_directories(CategoricalPaletteTests PRIVATE
+            ${CMAKE_SOURCE_DIR}
+        )
+        target_compile_features(CategoricalPaletteTests PRIVATE cxx_std_23)
+        gtest_discover_tests(CategoricalPaletteTests
             WORKING_DIRECTORY "${CUSTOM_QT_PATH}/bin"
             DISCOVERY_MODE PRE_TEST
             PROPERTIES

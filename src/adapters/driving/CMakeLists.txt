@@ -1,7 +1,7 @@
-if(NOT CUSTOM_QT_PATH)
+if (NOT CUSTOM_QT_PATH)
     message(STATUS "CUSTOM_QT_PATH is empty; skipping cw_api3d_driving (cadlib Qt not configured)")
     return()
-endif()
+endif ()
 
 list(PREPEND CMAKE_PREFIX_PATH "${CUSTOM_QT_PATH}")
 find_package(Qt6 6.8 REQUIRED COMPONENTS
@@ -49,16 +49,16 @@ target_include_directories(cw_api3d_driving PUBLIC
 
 target_link_libraries(cw_api3d_driving
         PUBLIC
-            cw_api3d_application
-            cw_api3d_ports
-            Qt6::Core
-            Qt6::Gui
-            Qt6::Widgets
-            Qt6::Qml
-            Qt6::Quick
-            Qt6::QuickControls2
-            Qt6::QuickWidgets
-            Qt6::Graphs
+        cw_api3d_application
+        cw_api3d_ports
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::Qml
+        Qt6::Quick
+        Qt6::QuickControls2
+        Qt6::QuickWidgets
+        Qt6::Graphs
 )
 
 cmake_path(NORMAL_PATH CUSTOM_QT_PATH OUTPUT_VARIABLE CW_NORMALIZED_QT_PATH)

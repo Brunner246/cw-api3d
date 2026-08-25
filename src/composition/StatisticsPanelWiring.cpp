@@ -7,6 +7,7 @@
 #include "src/adapters/driving/statistics/StatisticsViewModel.h"
 #include "src/application/ActivateElementsUseCase.h"
 #include "src/application/FetchElementSnapshotUseCase.h"
+#include "src/composition/HostAbsentQtRuntimeVisibility.h"
 #include "src/composition/PluginUiSession.h"
 
 #include <cwapi3d/ICwAPI3DControllerFactory.h>
@@ -128,6 +129,7 @@ namespace cw_api3d::composition
         return nullptr;
       }
 
+      ensureHostAbsentQtRuntimeVisible();
       gGraph->dock = new adapters::driving::StatisticsDockWidget(
         *gGraph->viewModel,
         *host,
