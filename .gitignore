@@ -18,7 +18,9 @@ vcpkg_installed/
 __pycache__/
 *.pyc
 
-docs/architecture/
+docs/architecture/*
+!docs/architecture/README.md
+!docs/architecture/hexagonal-overview.md
 docs/research/
 docs/sessions/
 docs/spec/

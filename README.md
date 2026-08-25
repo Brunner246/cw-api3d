@@ -4,12 +4,15 @@ C++ CAD plugin and SDK integration library for cadwork 3D, implementing Ports & 
 
 ## Structure
 
-- `src/ports/` — Port interfaces (`ILogger`, `IUtilityProvider`) and C++20 concepts (`concepts::Logger`, `concepts::UtilityProvider`).
-- `src/application/` — Application use cases (`IQueryPluginPathUseCase`, `QueryPluginPathUseCase`) orchestrating core logic via driven port interfaces.
+Architecture: [docs/architecture/README.md](docs/architecture/README.md) (D4 coupling contrast). Diagram catalog: [docs/architecture/hexagonal-overview.md](docs/architecture/hexagonal-overview.md).
+
+- `src/ports/` — Port interfaces (`ILogger`, `IUtilityProvider`, `IElementCatalog`, `IElementActivation`) and matching C++20 concepts.
+- `src/application/` — Use cases (`QueryPluginPathUseCase`, `FetchElementSnapshotUseCase`, `ActivateElementsUseCase`) and pure aggregation (`ElementStatisticsAggregator`). No Qt, no CwAPI3D.
 - `src/adapters/driven/` — Driven adapters:
   - `logging/` (`SpdLogLogger` wrapping spdlog).
-  - `cadwork/` (`CadworkUtilityAdapter` wrapping `ICwAPI3DUtilityController`).
-- `src/composition/` — Composition root (`PluginBootstrapper`) and C-safe DLL plugin entry point (`PluginEntry.cpp`, `bootstrapPlugin`).
+  - `cadwork/` (`CadworkUtilityAdapter`, `CadworkElementCatalogAdapter`, `CadworkElementActivationAdapter`).
+- `src/adapters/driving/` — Driving adapters (optional; skipped when `CUSTOM_QT_PATH` is empty): `StatisticsViewModel`, `StatisticsDockWidget`, `StatisticsPanel.qml`.
+- `src/composition/` — Composition root (`PluginBootstrapper`, `PluginUiSession`, `StatisticsPanelWiring`) and C-safe DLL entry (`PluginEntry.cpp`, `bootstrapPlugin`).
 - `cmake/` — CMake build logic and post-build automated plugin deployment (`cadwork_deploy.cmake`).
 - `tests/` — Test suites:
   - `tests/ports/`, `tests/application/`, `tests/adapters/`, `tests/composition/` — C++ GoogleTest unit/integration tests with test doubles (`tests/doubles/`).
