@@ -1,9 +1,9 @@
 # Test Suites & Verification Guide
 
-This directory contains the shared Python E2E harness. C++ GoogleTest suites live next to the code they cover:
+This directory contains the automated test suites for `cw-api3d`:
 
-1. **C++ Unit & Integration Tests** (GoogleTest / CTest) — `kit/tests/` for the starter; `examples/charts/tests/` for the charts plugin. Hermetic, in-memory doubles.
-2. **Python End-to-End (E2E) Test Harness** (pytest + uv) — Live integration tests launching cadwork 3D headlessly, running the embedded driver script, executing the selected example DLL, and verifying execution status. Default plugin name is `cw_api3d_hello`.
+1. **C++ Unit & Integration Tests** (GoogleTest / CTest) — Hermetic unit tests verifying ports, adapters, application use cases, and composition root logic using fast in-memory test doubles.
+2. **Python End-to-End (E2E) Test Harness** (pytest + uv) — Live integration tests launching cadwork 3D headlessly, running the embedded driver script, executing `cw_api3d_charts.dll`, and verifying execution status.
 
 ---
 
@@ -70,7 +70,7 @@ uv run invoke e2e
 | `configure` | `cmake --preset <preset>` |
 | `build` | configure if the Ninja graph is missing (`CMakeCache.txt` / `build.ninja` / `CMakeFiles/rules.ninja`), then `cmake --build out/build/<preset>` |
 | `test` | `ctest --test-dir out/build/<preset> --output-on-failure --parallel` (builds first) |
-| `e2e` | `uv run pytest -v` (builds first so the example DLL is deployed; `--plugin charts` selects `cw_api3d_charts`) |
+| `e2e` | `uv run pytest -v` (builds first so `cw_api3d_charts.dll` is deployed) |
 | `clean` | deletes `out/build/<preset>` only |
 | `rebuild` | `clean` then configure + build |
 | `dev` | `build` + `test` (does not launch cadwork) |
@@ -134,7 +134,7 @@ Filter individual test cases using GoogleTest filter flags:
 The Python E2E harness tests the deployed plugin DLL inside a live cadwork 3D process.
 
 ### Step 1: Build and Deploy Plugin DLL First
-The CMake build automatically copies each example DLL and runtime dependencies (`spdlog.dll`, `fmt.dll`) into the active cadwork userprofile directory (`<CADWORK_USP>/3d/API.x64/<target_name>/`):
+The CMake build automatically copies `cw_api3d_charts.dll` and runtime dependencies (`spdlog.dll`, `fmt.dll`) into the active cadwork userprofile directory (`<CADWORK_USP>/3d/API.x64/cw_api3d_charts/`):
 ```bash
 cmake --build out/build/local-relwithdebinfo
 ```
@@ -168,8 +168,8 @@ uv run pytest -v -k "not test_plugin_initialization_and_execution"
 | `CADWORK_USP` | Cadwork userprofile directory | Registry: `CADWORK_USP` / `CISTART_USP` |
 | `CADWORK_EXE_DIR` | Directory containing `3d.exe` | `<CADWORK_DIR>/EXE_<YEAR>` |
 | `CADWORK_CI_START` | Path to `ci_start.exe` launcher | `<CADWORK_DIR>/ci_start.exe` |
-| `CW_API3D_PLUGIN_NAME` | Example target / deploy folder | `cw_api3d_hello` (default) or `cw_api3d_charts` |
-| `CW_API3D_PLUGIN_DLL` | Path to the deployed example DLL | `<CADWORK_USP>/3d/API.x64/<name>/<name>.dll` |
+| `CW_API3D_PLUGIN_NAME` | Plugin target / deploy folder | `cw_api3d_charts` |
+| `CW_API3D_PLUGIN_DLL` | Path to the deployed plugin DLL | `<CADWORK_USP>/3d/API.x64/cw_api3d_charts/cw_api3d_charts.dll` |
 
 ---
 
@@ -181,7 +181,7 @@ sequenceDiagram
     participant Launcher as ci_start.exe
     participant Cadwork as Cadwork 3d.exe
     participant Driver as cw_e2e_driver.py (Embedded Python)
-    participant Plugin as example DLL (C++)
+    participant Plugin as cw_api3d_charts.dll (C++)
 
     Host->>Host: Sweep transient lockfiles (.~*.3d)
     Host->>Host: Stage driver script if path > 127 chars

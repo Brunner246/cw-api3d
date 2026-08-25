@@ -18,6 +18,10 @@ endif()
 
 enable_testing()
 
-add_subdirectory(kit)
-add_subdirectory(examples/hello-plugin)
-add_subdirectory(examples/charts)
+add_subdirectory(src/ports)
+add_subdirectory(src/application)
+add_subdirectory(src/adapters/driven/logging)
+add_subdirectory(src/adapters/driven/cadwork)
+add_subdirectory(src/adapters/driving)
+add_subdirectory(src/composition)
+add_subdirectory(tests)

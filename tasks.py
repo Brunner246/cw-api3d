@@ -241,12 +241,6 @@ def test(
     _run(c, command, env=_msvc_env())
 
 
-_PLUGIN_ALIASES = {
-    "hello": "cw_api3d_hello",
-    "charts": "cw_api3d_charts",
-}
-
-
 @task(auto_shortflags=False)
 def e2e(
     c: Context,
@@ -254,30 +248,25 @@ def e2e(
     host_only: bool = False,
     build: bool = True,
     preset: str = DEFAULT_PRESET,
-    plugin: str = "hello",
 ) -> None:
     """Run the Python E2E harness (pytest tests/e2e).
 
     Args:
         args: Extra arguments forwarded to pytest verbatim.
         host_only: Skip the live cadwork launch test.
-        build: Build first so the example DLL is deployed (default true).
+        build: Build first so cw_api3d_charts.dll is deployed (default true).
         preset: CMake configure preset used when building.
-        plugin: Example alias (hello, charts) or full target name (cw_api3d_hello).
     """
     if build:
         _build(c, preset)
     if shutil.which("uv") is None:
         raise RuntimeError("uv was not found on PATH. Install it (winget install astral-sh.uv) and retry.")
-    plugin_name = _PLUGIN_ALIASES.get(plugin, plugin)
-    e2e_env = dict(os.environ)
-    e2e_env["CW_API3D_PLUGIN_NAME"] = plugin_name
     command = "uv run pytest -v"
     if host_only:
         command += f' -k "{HOST_ONLY_K}"'
     if args:
         command += f" {args}"
-    _run(c, command, env=e2e_env)
+    _run(c, command)
 
 
 def _make_writable(path: Path) -> None:

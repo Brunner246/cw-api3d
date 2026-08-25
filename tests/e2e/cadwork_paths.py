@@ -20,7 +20,7 @@ CADWORK_EXE_RELPATH = Path("3d.x64") / "3d.exe"
 # Keep in sync with cmake/cadwork_deploy.cmake and build-scripts/new-local-profile.ps1.
 USERPROFILE_MARKER_NAME = ".cw-userprofile"
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_PLUGIN_NAME = "cw_api3d_hello"
+DEFAULT_PLUGIN_NAME = "cw_api3d_charts"
 
 
 def _registry_value(value_name: str) -> Path | None:
@@ -186,9 +186,9 @@ def plugin_name() -> str:
 
 
 def plugin_dll_path() -> Path:
-    """Resolve the path to the selected example plugin DLL.
+    """Resolve the path to the charts plugin DLL.
 
-    ``CW_API3D_PLUGIN_NAME`` selects the example (default ``cw_api3d_hello``).
+    ``CW_API3D_PLUGIN_NAME`` overrides the plugin target name (default ``cw_api3d_charts``).
     ``CW_API3D_PLUGIN_DLL`` overrides the resolved path entirely.
 
     Returns:

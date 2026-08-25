@@ -91,8 +91,6 @@ jobs:
         with:
           name: cw_api3d-windows-x64-release
           path: |
-            out/build/msvc-release/bin/release/cw_api3d_hello.dll
-            out/build/msvc-release/bin/release/cw_api3d_hello.lib
             out/build/msvc-release/bin/release/cw_api3d_charts.dll
             out/build/msvc-release/bin/release/cw_api3d_charts.lib
             out/build/msvc-release/lib/release/*.lib
