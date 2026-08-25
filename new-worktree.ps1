@@ -11,10 +11,11 @@
   This script creates the worktree, copies those across, and prints the path.
 
   It also gives the worktree its OWN plugin deploy target (a slim cadwork userprofil under
-  -ProfileRoot, recorded in the worktree's .cw-userprofile marker). Without that, every worktree's
-  build post-build-copies over the same shared <userprofil>\3d\API.x64\cw_api3d -- so two worktrees
-  overwrite each other's cw_api3d.dll, the e2e harness tests whichever built last, and a build fails
-  outright whenever a running cadwork holds the DLL open.
+  -ProfileRoot, recorded in the worktree's .cw-userprofile marker). Without that, two worktrees
+  building the same example post-build-copy over the same <userprofil>\3d\API.x64\<target> folder,
+  the e2e harness tests whichever built last, and a build fails outright whenever a running cadwork
+  holds the DLL open. Distinct example target names (cw_api3d_hello vs cw_api3d_charts) already
+  coexist in one profile; worktrees still isolate two checkouts of the same example.
 
   Worktrees are rooted at a short path on purpose -- a long nested path blows MAX_PATH during the
   build and surfaces as a misleading C1083 deep in a header, not as a path-length error.

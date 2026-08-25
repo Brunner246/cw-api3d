@@ -20,6 +20,7 @@ CADWORK_EXE_RELPATH = Path("3d.x64") / "3d.exe"
 # Keep in sync with cmake/cadwork_deploy.cmake and build-scripts/new-local-profile.ps1.
 USERPROFILE_MARKER_NAME = ".cw-userprofile"
 REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_PLUGIN_NAME = "cw_api3d_hello"
 
 
 def _registry_value(value_name: str) -> Path | None:
@@ -178,36 +179,46 @@ def ci_start_path() -> Path:
     return Path(DEFAULT_CI_START)
 
 
+def plugin_name() -> str:
+    """Return the plugin target name used for deploy folders and DLL filenames."""
+    override = os.environ.get("CW_API3D_PLUGIN_NAME", "").strip()
+    return override or DEFAULT_PLUGIN_NAME
+
+
 def plugin_dll_path() -> Path:
-    """Resolve the path to the cw_api3d plugin DLL.
+    """Resolve the path to the selected example plugin DLL.
+
+    ``CW_API3D_PLUGIN_NAME`` selects the example (default ``cw_api3d_hello``).
+    ``CW_API3D_PLUGIN_DLL`` overrides the resolved path entirely.
 
     Returns:
-        Path to cw_api3d.dll (deployed or build artifact).
+        Path to the plugin DLL (deployed or build artifact).
     """
     override = os.environ.get("CW_API3D_PLUGIN_DLL")
     if override:
         return Path(override)
 
+    name = plugin_name()
+    dll_name = f"{name}.dll"
+
     usp = userprofil_dir()
     if usp is not None:
-        deployed = usp / "3d" / "API.x64" / "cw_api3d" / "cw_api3d.dll"
+        deployed = usp / "3d" / "API.x64" / name / dll_name
         if deployed.exists():
             return deployed
 
-    # Fallback to local build directory
-    repo_root = Path(__file__).resolve().parents[2]
     build_candidates = [
-        repo_root / "out" / "build" / "local-debug" / "src" / "composition" / "cw_api3d.dll",
-        repo_root / "out" / "build" / "local-release" / "src" / "composition" / "cw_api3d.dll",
-        repo_root / "out" / "build" / "local-relwithdebinfo" / "src" / "composition" / "cw_api3d.dll",
-        repo_root / "build" / "src" / "composition" / "cw_api3d.dll",
+        REPO_ROOT / "out" / "build" / "local-debug" / "bin" / "debug" / dll_name,
+        REPO_ROOT / "out" / "build" / "local-release" / "bin" / "release" / dll_name,
+        REPO_ROOT / "out" / "build" / "local-relwithdebinfo" / "bin" / "relwithdebinfo" / dll_name,
+        REPO_ROOT / "build" / "bin" / dll_name,
     ]
     for candidate in build_candidates:
         if candidate.exists():
             return candidate
 
     if usp is not None:
-        return usp / "3d" / "API.x64" / "cw_api3d" / "cw_api3d.dll"
+        return usp / "3d" / "API.x64" / name / dll_name
 
     return build_candidates[0]
 
@@ -221,6 +232,7 @@ def resolved_env() -> dict[str, str]:
     resolved: dict[str, str] = {
         "CW_PROFILE_YEAR": profile_year(),
         "CADWORK_CI_START": str(ci_start_path()),
+        "CW_API3D_PLUGIN_NAME": plugin_name(),
         "CW_API3D_PLUGIN_DLL": str(plugin_dll_path()),
     }
     install = install_dir()

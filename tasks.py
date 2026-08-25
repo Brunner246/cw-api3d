@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -240,6 +241,12 @@ def test(
     _run(c, command, env=_msvc_env())
 
 
+_PLUGIN_ALIASES = {
+    "hello": "cw_api3d_hello",
+    "charts": "cw_api3d_charts",
+}
+
+
 @task(auto_shortflags=False)
 def e2e(
     c: Context,
@@ -247,25 +254,56 @@ def e2e(
     host_only: bool = False,
     build: bool = True,
     preset: str = DEFAULT_PRESET,
+    plugin: str = "hello",
 ) -> None:
     """Run the Python E2E harness (pytest tests/e2e).
 
     Args:
         args: Extra arguments forwarded to pytest verbatim.
         host_only: Skip the live cadwork launch test.
-        build: Build first so cw_api3d.dll is deployed (default true).
+        build: Build first so the example DLL is deployed (default true).
         preset: CMake configure preset used when building.
+        plugin: Example alias (hello, charts) or full target name (cw_api3d_hello).
     """
     if build:
         _build(c, preset)
     if shutil.which("uv") is None:
         raise RuntimeError("uv was not found on PATH. Install it (winget install astral-sh.uv) and retry.")
+    plugin_name = _PLUGIN_ALIASES.get(plugin, plugin)
+    e2e_env = dict(os.environ)
+    e2e_env["CW_API3D_PLUGIN_NAME"] = plugin_name
     command = "uv run pytest -v"
     if host_only:
         command += f' -k "{HOST_ONLY_K}"'
     if args:
         command += f" {args}"
-    _run(c, command)
+    _run(c, command, env=e2e_env)
+
+
+def _make_writable(path: Path) -> None:
+    """Clear the read-only bit Git sets on FetchContent pack files (Windows)."""
+    try:
+        path.chmod(path.stat().st_mode | stat.S_IWRITE)
+    except OSError:
+        pass
+
+
+def _rmtree(path: Path) -> None:
+    """Remove a build tree, including read-only files under `_deps/**/.git`."""
+    for root, dirs, files in os.walk(path):
+        for name in files + dirs:
+            _make_writable(Path(root) / name)
+    _make_writable(path)
+
+    def onexc(func: object, name: str, exc: BaseException) -> None:
+        target = Path(name)
+        _make_writable(target)
+        try:
+            func(name)
+        except OSError as retry_exc:
+            raise retry_exc from exc
+
+    shutil.rmtree(path, onexc=onexc)
 
 
 @task
@@ -280,7 +318,7 @@ def clean(c: Context, preset: str = DEFAULT_PRESET) -> None:
         print(f"Nothing to clean: {target} does not exist")
         return
     print(f"Removing {target}")
-    shutil.rmtree(target)
+    _rmtree(target)
 
 
 @task

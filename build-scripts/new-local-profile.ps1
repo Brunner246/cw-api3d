@@ -3,14 +3,15 @@
   Create a slim, checkout-local cadwork userprofil and point this checkout's plugin deploy at it.
 
 .DESCRIPTION
-  Every build post-build-copies cw_api3d.dll into ONE shared directory --
-  <userprofil>\3d\API.x64\cw_api3d (see cmake/cadwork_deploy.cmake). With several git worktrees
-  that means they overwrite each other's DLL, the e2e harness tests whichever worktree built last,
-  and a build fails outright whenever a running cadwork holds that DLL open.
+  Every build post-build-copies each example DLL into ONE shared profile --
+  <userprofil>\3d\API.x64\<target_name> (see cmake/cadwork_deploy.cmake). With several git
+  worktrees building the same example that means they overwrite each other's DLL, the e2e
+  harness tests whichever worktree built last, and a build fails outright whenever a running
+  cadwork holds that DLL open.
 
-  This script gives a checkout its own profile, hence its own plugin directory:
+  This script gives a checkout its own profile, hence its own plugin directories:
 
-      <Root>\userprofil_<Year>_<Name>\3d\API.x64\cw_api3d
+      <Root>\userprofil_<Year>_<Name>\3d\API.x64\<target_name>
 
   and writes the profile path into `<RepoRoot>\.cw-userprofile`, the gitignored marker that
   cmake/cadwork_deploy.cmake and tests/e2e/cadwork_paths.py both read. From then on this checkout

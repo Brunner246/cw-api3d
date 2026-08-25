@@ -10,17 +10,14 @@ include(cmake/CwAPI3D.cmake)
 include(cmake/cadwork_deploy.cmake)
 
 find_package(spdlog CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 
 if(CUSTOM_QT_PATH)
     list(PREPEND CMAKE_PREFIX_PATH "${CUSTOM_QT_PATH}")
 endif()
 
-add_subdirectory(src/ports)
-add_subdirectory(src/application)
-add_subdirectory(src/adapters/driven/logging)
-add_subdirectory(src/adapters/driven/cadwork)
-add_subdirectory(src/adapters/driving)
-add_subdirectory(src/composition)
-
 enable_testing()
-add_subdirectory(tests)
+
+add_subdirectory(kit)
+add_subdirectory(examples/hello-plugin)
+add_subdirectory(examples/charts)

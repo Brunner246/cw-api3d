@@ -1,22 +1,25 @@
 # cw-api3d
 
-C++ CAD plugin and SDK integration library for cadwork 3D, implementing Ports & Adapters (Hexagonal) architecture.
+C++ CAD plugin kit and example plugins for cadwork 3D, implementing Ports & Adapters (Hexagonal) architecture.
+
+The **kit** is the common start: load inside cadwork, log, query the plugin path. Each **example** is a separate plugin DLL that links the kit. Git worktrees isolate local cadwork userprofils; they are not the examples.
 
 ## Structure
 
-Architecture: [docs/architecture/README.md](docs/architecture/README.md) (D4 coupling contrast). Diagram catalog: [docs/architecture/hexagonal-overview.md](docs/architecture/hexagonal-overview.md).
+Kit architecture: [docs/architecture/README.md](docs/architecture/README.md). Charts D4 coupling contrast: [examples/charts/docs/architecture/README.md](examples/charts/docs/architecture/README.md).
 
-- `src/ports/` — Port interfaces (`ILogger`, `IUtilityProvider`, `IElementCatalog`, `IElementActivation`) and matching C++20 concepts.
-- `src/application/` — Use cases (`QueryPluginPathUseCase`, `FetchElementSnapshotUseCase`, `ActivateElementsUseCase`) and pure aggregation (`ElementStatisticsAggregator`). No Qt, no CwAPI3D.
-- `src/adapters/driven/` — Driven adapters:
-  - `logging/` (`SpdLogLogger` wrapping spdlog).
-  - `cadwork/` (`CadworkUtilityAdapter`, `CadworkElementCatalogAdapter`, `CadworkElementActivationAdapter`).
-- `src/adapters/driving/` — Driving adapters (optional; skipped when `CUSTOM_QT_PATH` is empty): `StatisticsViewModel`, `StatisticsDockWidget`, `StatisticsPanel.qml`.
-- `src/composition/` — Composition root (`PluginBootstrapper`, `PluginUiSession`, `StatisticsPanelWiring`) and C-safe DLL entry (`PluginEntry.cpp`, `bootstrapPlugin`).
-- `cmake/` — CMake build logic and post-build automated plugin deployment (`cadwork_deploy.cmake`).
-- `tests/` — Test suites:
-  - `tests/ports/`, `tests/application/`, `tests/adapters/`, `tests/composition/` — C++ GoogleTest unit/integration tests with test doubles (`tests/doubles/`).
-  - `tests/e2e/` — Python end-to-end test harness running inside live cadwork 3D.
+- `kit/` — Hexagonal starter libraries (no DLL):
+  - `src/ports/` — `ILogger`, `IUtilityProvider` and matching C++20 concepts.
+  - `src/application/` — `QueryPluginPathUseCase`. No Qt, no CwAPI3D.
+  - `src/adapters/driven/` — `SpdLogLogger`, `CadworkUtilityAdapter`.
+  - `src/composition/` — `PluginBootstrapper` / `bootstrapPlugin` (no UI).
+  - `tests/` — GoogleTest for the kit, doubles under `kit/tests/doubles/`.
+- `examples/hello-plugin/` — Copy-this start. Produces `cw_api3d_hello.dll` (deployed to `API.x64/cw_api3d_hello/`).
+- `examples/charts/` — Dockable model statistics. Owns element catalog/activation ports, snapshot aggregation, Qt driving adapters, and `cw_api3d_charts.dll` (`API.x64/cw_api3d_charts/`).
+- `cmake/` — Shared CMake and post-build deploy (`cadwork_deploy.cmake`). Deploy folder is `API.x64/<target_name>/`.
+- `tests/e2e/` — Python end-to-end harness inside live cadwork 3D. Default plugin `cw_api3d_hello`; override with `CW_API3D_PLUGIN_NAME` or `invoke e2e --plugin charts`.
+
+The previous single-plugin path `API.x64/cw_api3d/` is unused. Remove that folder from a userprofil after the first deploy of the new names.
 
 ---
 
@@ -39,6 +42,7 @@ uv run invoke e2e
 ```powershell
 uv run invoke build --preset local-debug
 uv run invoke test --filter CompositionRoot
+uv run invoke e2e --plugin charts
 uv run invoke e2e --host-only          # path/staging tests, no cadwork launch
 uv run invoke e2e --no-build           # skip the C++ rebuild
 uv run invoke e2e --args "-k test_cadwork_paths_resolution"
@@ -51,11 +55,15 @@ See [tests/README.md](tests/README.md) for the underlying cmake / ctest / pytest
 
 ## Parallel Worktrees
 
-`new-worktree.cmd -Key <name>` creates a ready-to-build worktree at `D:\wt\cw-api3d\<name>` on
-branch `wt-<name>`. It carries over what git never does — the gitignored `CMakeUserPresets.json`
+Worktrees are a local workflow (short path, private cadwork userprofil), not the identity of an
+example. `new-worktree.cmd -Key <name>` creates a ready-to-build checkout at `D:\wt\cw-api3d\<name>`
+on branch `wt-<name>`. It carries over what git never does — the gitignored `CMakeUserPresets.json`
 and the git-excluded `CLAUDE.md` / `AGENTS.md` — and gives the worktree its **own** cadwork
-userprofil (`D:\cadwork\userprofil_<year>_<name>`), so parallel worktrees no longer overwrite each
-other's `cw_api3d.dll` and a build no longer fails because a running cadwork holds it open.
+userprofil (`D:\cadwork\userprofil_<year>_<name>`), so two checkouts of the same example do not
+overwrite each other's DLL and a build no longer fails because a running cadwork holds it open.
+
+Hello and charts already use distinct DLL names, so they can coexist in one profile. A second
+checkout of *charts* still needs its own profile.
 
 ```powershell
 .\new-worktree.cmd -Key feature-x

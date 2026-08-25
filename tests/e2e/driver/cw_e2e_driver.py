@@ -3,7 +3,7 @@
 Runs inside cadwork 3D's embedded Python interpreter when invoked via
 ci_start.exe <model.3d> /EXE=<exe_dir> /RUNPROGRAM=<path_to_driver.py>.
 
-Discovers the deployed or configured cw_api3d.dll, executes it via
+Discovers the deployed or configured example plugin DLL, executes it via
 utility_controller.run_external_program_from_custom_directory, and writes
 a results.json sentinel file for the host test harness.
 """
@@ -54,16 +54,17 @@ def _write_results(data: dict, results_path: Path, log_path: Path | None = None)
 
 
 def resolve_plugin_dll() -> Path | None:
-    """Resolve cw_api3d.dll from env or registry / userprofil."""
+    """Resolve the example plugin DLL from env or the cadwork userprofil."""
     override = os.environ.get("CW_API3D_PLUGIN_DLL")
     if override:
         path = Path(override)
         if path.exists():
             return path
 
+    name = os.environ.get("CW_API3D_PLUGIN_NAME", "cw_api3d_hello").strip() or "cw_api3d_hello"
     usp = os.environ.get("CADWORK_USP")
     if usp:
-        candidate = Path(usp) / "3d" / "API.x64" / "cw_api3d" / "cw_api3d.dll"
+        candidate = Path(usp) / "3d" / "API.x64" / name / f"{name}.dll"
         if candidate.exists():
             return candidate
 
@@ -94,7 +95,7 @@ def main() -> None:
         plugin_dll = resolve_plugin_dll()
         if plugin_dll is None or not plugin_dll.exists():
             raise FileNotFoundError(
-                f"cw_api3d.dll not found at '{plugin_dll}'. Ensure plugin is built and deployed."
+                f"plugin DLL not found at '{plugin_dll}'. Ensure the example is built and deployed."
             )
 
         _log(f"Executing plugin DLL via utility_controller: {plugin_dll}", log_path)

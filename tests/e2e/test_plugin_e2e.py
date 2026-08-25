@@ -108,7 +108,7 @@ def test_plugin_initialization_and_execution(
     driver_script_path: Path,
     e2e_run_dir: dict[str, Path],
 ) -> None:
-    """Launch cadwork with test_model.3d, run cw_e2e_driver.py, and verify cw_api3d.dll execution."""
+    """Launch cadwork with test_model.3d, run cw_e2e_driver.py, and verify plugin execution."""
     work_dir = e2e_run_dir["work_dir"]
     model_path = e2e_run_dir["model_path"]
     results_path = e2e_run_dir["results_path"]
