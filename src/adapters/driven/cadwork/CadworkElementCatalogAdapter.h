@@ -35,19 +35,9 @@ namespace cw_api3d::adapters::driven::cadwork
       return attributes ? attributes->getElementMaterialName(id) : nullptr;
     }
 
-    [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DString* getElementTypeDescription(const CwAPI3D::elementID id) const
-    {
-      return elements ? elements->getElementTypeDescription(id) : nullptr;
-    }
-
     [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DElementType* getElementType(const CwAPI3D::elementID id) const
     {
       return attributes ? attributes->getElementType(id) : nullptr;
-    }
-
-    [[nodiscard]] bool isBeam(const CwAPI3D::elementID id) const
-    {
-      return attributes && attributes->isBeam(id);
     }
 
     [[nodiscard]] double getLength(const CwAPI3D::elementID id) const

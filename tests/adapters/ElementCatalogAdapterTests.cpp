@@ -78,6 +78,58 @@ TEST(ElementCatalogAdapterTests, MapsRectangularBeamBeforeGenericBeam)
   EXPECT_EQ(result->records.front().kind, ElementKind::RectangularBeam);
 }
 
+TEST(ElementCatalogAdapterTests, MapsPanelKindAndLabelFromTypeFlags)
+{
+  FakeHostElementCatalog host;
+  ElementSnapshot snapshot;
+  snapshot.records.push_back(ElementRecord{
+    .id = 1,
+    .kind = ElementKind::Panel});
+  host.setAll(snapshot);
+  const FakeAdapter adapter(&host);
+
+  const auto result = adapter.fetch(ElementUniverse::All);
+
+  ASSERT_TRUE(result.has_value());
+  ASSERT_EQ(result->records.size(), 1u);
+  EXPECT_EQ(result->records.front().kind, ElementKind::Panel);
+  EXPECT_EQ(result->records.front().kindLabel, std::string{toString(ElementKind::Panel)});
+}
+
+TEST(ElementCatalogAdapterTests, MapsPanelBeforeRectangularBeamWhenBothFlagsTrue)
+{
+  FakeHostElementCatalog host;
+  ElementSnapshot snapshot;
+  snapshot.records.push_back(ElementRecord{
+    .id = 1,
+    .kind = ElementKind::Panel});
+  host.setAll(snapshot);
+  host.addOverlappingTypeFlag(ElementKind::RectangularBeam);
+  const FakeAdapter adapter(&host);
+
+  const auto result = adapter.fetch(ElementUniverse::All);
+
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(result->records.front().kind, ElementKind::Panel);
+}
+
+TEST(ElementCatalogAdapterTests, MapsOpeningBeforePanelWhenBothFlagsTrue)
+{
+  FakeHostElementCatalog host;
+  ElementSnapshot snapshot;
+  snapshot.records.push_back(ElementRecord{
+    .id = 1,
+    .kind = ElementKind::Opening});
+  host.setAll(snapshot);
+  host.addOverlappingTypeFlag(ElementKind::Panel);
+  const FakeAdapter adapter(&host);
+
+  const auto result = adapter.fetch(ElementUniverse::All);
+
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(result->records.front().kind, ElementKind::Opening);
+}
+
 TEST(ElementCatalogAdapterTests, NonFiniteGeometryBecomesNullopt)
 {
   FakeHostElementCatalog host;
@@ -181,5 +233,5 @@ TEST(ElementCatalogAdapterTests, CopiesWideUmlautAttributesIntoSnapshot)
   ASSERT_EQ(result->records.size(), 1u);
   EXPECT_EQ(result->records.front().name, "Überzug");
   EXPECT_EQ(result->records.front().material, "Grün");
-  EXPECT_EQ(result->records.front().kindLabel, "Öffnung");
+  EXPECT_EQ(result->records.front().kindLabel, std::string{toString(ElementKind::Opening)});
 }

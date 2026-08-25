@@ -63,6 +63,27 @@ namespace cw_api3d::tests::doubles
     void setKind(const application::ElementKind kind) noexcept
     {
       mKind = kind;
+      mExtraPanel = false;
+      mExtraRectangularBeam = false;
+      mExtraOpening = false;
+    }
+
+    void addFlag(const application::ElementKind flag) noexcept
+    {
+      if (flag == application::ElementKind::Panel)
+      {
+        mExtraPanel = true;
+        return;
+      }
+      if (flag == application::ElementKind::RectangularBeam)
+      {
+        mExtraRectangularBeam = true;
+        return;
+      }
+      if (flag == application::ElementKind::Opening)
+      {
+        mExtraOpening = true;
+      }
     }
 
     [[nodiscard]] bool isFramedWall() const noexcept
@@ -90,7 +111,7 @@ namespace cw_api3d::tests::doubles
 
     [[nodiscard]] bool isRectangularBeam() const noexcept
     {
-      return mKind == application::ElementKind::RectangularBeam;
+      return mKind == application::ElementKind::RectangularBeam || mExtraRectangularBeam;
     }
 
     [[nodiscard]] bool isCircularBeam() const noexcept
@@ -100,12 +121,12 @@ namespace cw_api3d::tests::doubles
 
     [[nodiscard]] bool isPanel() const noexcept
     {
-      return mKind == application::ElementKind::Panel;
+      return mKind == application::ElementKind::Panel || mExtraPanel;
     }
 
     [[nodiscard]] bool isOpening() const noexcept
     {
-      return mKind == application::ElementKind::Opening;
+      return mKind == application::ElementKind::Opening || mExtraOpening;
     }
 
     void destroy() noexcept
@@ -120,6 +141,9 @@ namespace cw_api3d::tests::doubles
 
   private:
     application::ElementKind mKind{application::ElementKind::Other};
+    bool mExtraPanel{false};
+    bool mExtraRectangularBeam{false};
+    bool mExtraOpening{false};
     bool mDestroyCalled{false};
   };
 
@@ -148,6 +172,11 @@ namespace cw_api3d::tests::doubles
       mBehaviour = behaviour;
     }
 
+    void addOverlappingTypeFlag(const application::ElementKind flag)
+    {
+      mOverlappingFlags.push_back(flag);
+    }
+
     FakeHostElementIdList* getActiveIdentifiableElementIDs()
     {
       return listFor(mActive, mActiveList);
@@ -170,24 +199,14 @@ namespace cw_api3d::tests::doubles
       return &mMaterial;
     }
 
-    FakeHostString* getElementTypeDescription(const application::ElementId id)
-    {
-      mKindLabel.setNarrow(find(id).kindLabel);
-      return &mKindLabel;
-    }
-
     FakeHostElementType* getElementType(const application::ElementId id)
     {
       mType.setKind(find(id).kind);
+      for (const auto flag : mOverlappingFlags)
+      {
+        mType.addFlag(flag);
+      }
       return &mType;
-    }
-
-    [[nodiscard]] bool isBeam(const application::ElementId id) const
-    {
-      const auto kind = find(id).kind;
-      return kind == application::ElementKind::RectangularBeam
-             || kind == application::ElementKind::CircularBeam
-             || kind == application::ElementKind::Beam;
     }
 
     [[nodiscard]] double getLength(const application::ElementId id) const
@@ -288,8 +307,8 @@ namespace cw_api3d::tests::doubles
     FakeHostElementIdList mAllList;
     FakeHostString mName;
     FakeHostString mMaterial;
-    FakeHostString mKindLabel;
     FakeHostElementType mType;
+    std::vector<application::ElementKind> mOverlappingFlags;
     Behaviour mBehaviour{Behaviour::ReturnsList};
     int mCallCount{0};
   };

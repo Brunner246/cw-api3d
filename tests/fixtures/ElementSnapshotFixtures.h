@@ -31,30 +31,7 @@ namespace cw_api3d::tests::fixtures
 
   [[nodiscard]] inline const char* kindLabelOf(const ElementKind kind) noexcept
   {
-    switch (kind)
-    {
-      case ElementKind::RectangularBeam:
-        return "Rectangular beam";
-      case ElementKind::CircularBeam:
-        return "Circular beam";
-      case ElementKind::Panel:
-        return "Panel";
-      case ElementKind::Opening:
-        return "Opening";
-      case ElementKind::FramedWall:
-        return "Framed wall";
-      case ElementKind::SolidWoodWall:
-        return "Solid wood wall";
-      case ElementKind::LogWall:
-        return "Log wall";
-      case ElementKind::Wall:
-        return "Wall";
-      case ElementKind::Beam:
-        return "Beam";
-      case ElementKind::Other:
-        return "Other";
-    }
-    return "Other";
+    return application::toString(kind).data();
   }
 
   [[nodiscard]] inline ElementKind kindForId(const ElementId id) noexcept

@@ -59,9 +59,7 @@ namespace cw_api3d::adapters::driven::cadwork
       { host.getAllIdentifiableElementIDs() } -> HostIdListPointer;
       { host.getName(id) } -> HostStringPointer;
       { host.getElementMaterialName(id) } -> HostStringPointer;
-      { host.getElementTypeDescription(id) } -> HostStringPointer;
       { host.getElementType(id) } -> HostElementTypePointer;
-      { host.isBeam(id) } -> std::convertible_to<bool>;
       { host.getLength(id) } -> std::convertible_to<double>;
       { host.getWidth(id) } -> std::convertible_to<double>;
       { host.getHeight(id) } -> std::convertible_to<double>;
@@ -174,7 +172,7 @@ namespace cw_api3d::adapters::driven::cadwork
     }
 
     template<concepts::HostElementType Type>
-    [[nodiscard]] application::ElementKind mapElementKind(Type& type, const bool isBeam) noexcept
+    [[nodiscard]] application::ElementKind mapElementKind(Type& type) noexcept
     {
       if (type.isFramedWall())
       {
@@ -192,6 +190,14 @@ namespace cw_api3d::adapters::driven::cadwork
       {
         return application::ElementKind::Wall;
       }
+      if (type.isOpening())
+      {
+        return application::ElementKind::Opening;
+      }
+      if (type.isPanel())
+      {
+        return application::ElementKind::Panel;
+      }
       if (type.isRectangularBeam())
       {
         return application::ElementKind::RectangularBeam;
@@ -199,18 +205,6 @@ namespace cw_api3d::adapters::driven::cadwork
       if (type.isCircularBeam())
       {
         return application::ElementKind::CircularBeam;
-      }
-      if (type.isPanel())
-      {
-        return application::ElementKind::Panel;
-      }
-      if (type.isOpening())
-      {
-        return application::ElementKind::Opening;
-      }
-      if (isBeam)
-      {
-        return application::ElementKind::Beam;
       }
       return application::ElementKind::Other;
     }
@@ -287,11 +281,11 @@ namespace cw_api3d::adapters::driven::cadwork
       application::ElementRecord record{.id = id};
       record.name = detail::copyHostString(mHost->getName(id));
       record.material = detail::copyHostString(mHost->getElementMaterialName(id));
-      record.kindLabel = detail::copyHostString(mHost->getElementTypeDescription(id));
       if (auto* type = mHost->getElementType(id))
       {
-        record.kind = detail::mapElementKind(*type, mHost->isBeam(id));
+        record.kind = detail::mapElementKind(*type);
       }
+      record.kindLabel = std::string{application::toString(record.kind)};
       record.length = detail::finiteOrNull(mHost->getLength(id));
       record.width = detail::finiteOrNull(mHost->getWidth(id));
       record.height = detail::finiteOrNull(mHost->getHeight(id));
