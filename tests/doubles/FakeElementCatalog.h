@@ -11,7 +11,7 @@
 namespace cw_api3d::tests::doubles
 {
 
-  class FakeElementCatalog : public ports::interfaces::IElementCatalog
+  class FakeElementCatalog : public ports::IElementCatalog
   {
   public:
     void setActive(application::ElementSnapshot snapshot)

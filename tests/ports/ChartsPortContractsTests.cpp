@@ -5,17 +5,16 @@
 #include "tests/doubles/FakeElementActivation.h"
 #include "tests/doubles/FakeElementCatalog.h"
 
+#include <concepts>
 #include <vector>
 
 using namespace cw_api3d::ports;
 using namespace cw_api3d::tests::doubles;
 
-static_assert(concepts::ElementCatalog<FakeElementCatalog>, "FakeElementCatalog must satisfy concepts::ElementCatalog");
-static_assert(concepts::ElementActivation<FakeElementActivation>, "FakeElementActivation must satisfy concepts::ElementActivation");
-static_assert(std::derived_from<FakeElementCatalog, interfaces::IElementCatalog>, "FakeElementCatalog must derive from IElementCatalog");
-static_assert(std::derived_from<FakeElementActivation, interfaces::IElementActivation>, "FakeElementActivation must derive from IElementActivation");
+static_assert(std::derived_from<FakeElementCatalog, IElementCatalog>, "FakeElementCatalog must derive from IElementCatalog");
+static_assert(std::derived_from<FakeElementActivation, IElementActivation>, "FakeElementActivation must derive from IElementActivation");
 
-TEST(ChartsPortConceptsTests, FakeElementCatalogReturnsConfiguredSnapshot)
+TEST(ChartsPortContractsTests, FakeElementCatalogReturnsConfiguredSnapshot)
 {
   FakeElementCatalog catalog;
   cw_api3d::application::ElementSnapshot snapshot;
@@ -29,7 +28,7 @@ TEST(ChartsPortConceptsTests, FakeElementCatalogReturnsConfiguredSnapshot)
   EXPECT_EQ(result->records.front().id, 7u);
 }
 
-TEST(ChartsPortConceptsTests, FakeElementActivationRecordsIds)
+TEST(ChartsPortContractsTests, FakeElementActivationRecordsIds)
 {
   FakeElementActivation activation;
   const std::vector<cw_api3d::application::ElementId> ids{3, 5};

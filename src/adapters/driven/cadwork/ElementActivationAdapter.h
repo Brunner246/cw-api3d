@@ -1,50 +1,27 @@
 #pragma once
 
+#include "src/adapters/driven/cadwork/HostContracts.h"
 #include "src/application/ElementSnapshot.h"
 #include "src/ports/ElementActivation.h"
 #include "src/ports/Logger.h"
 
-#include <concepts>
-#include <cstdint>
 #include <exception>
 #include <expected>
 #include <span>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 
 namespace cw_api3d::adapters::driven::cadwork
 {
 
-  namespace concepts
-  {
-
-    template<typename T>
-    concept HostMutableIdList = requires(T& list, application::ElementId id, std::uint32_t index) {
-      { list.count() } -> std::convertible_to<std::uint32_t>;
-      { list.at(index) } -> std::convertible_to<application::ElementId>;
-      list.append(id);
-    };
-
-    template<typename T>
-    concept HostMutableIdListPointer = std::is_pointer_v<T> && HostMutableIdList<std::remove_pointer_t<T>>;
-
-    template<typename T>
-    concept ElementActivationSource = requires(T& host) {
-      { host.createEmptyElementIDList() } -> HostMutableIdListPointer;
-      host.setActive(host.createEmptyElementIDList());
-    };
-
-  } // namespace concepts
-
   template<concepts::ElementActivationSource Host>
-  class ElementActivationAdapter final : public ports::interfaces::IElementActivation
+  class ElementActivationAdapter final : public ports::IElementActivation
   {
   public:
     explicit ElementActivationAdapter(
       Host* host = nullptr,
-      ports::interfaces::LoggerPtr logger = nullptr) noexcept
+      ports::LoggerPtr logger = nullptr) noexcept
       : mHost(host)
       , mLogger(std::move(logger))
     {
@@ -112,7 +89,7 @@ namespace cw_api3d::adapters::driven::cadwork
     }
 
     Host* mHost{nullptr};
-    ports::interfaces::LoggerPtr mLogger;
+    ports::LoggerPtr mLogger;
   };
 
 } // namespace cw_api3d::adapters::driven::cadwork

@@ -38,12 +38,12 @@ namespace cw_api3d::composition
     sessionSlot().reset();
   }
 
-  void PluginUiSession::setLogger(ports::interfaces::LoggerPtr logger) noexcept
+  void PluginUiSession::setLogger(ports::LoggerPtr logger) noexcept
   {
     mLogger = std::move(logger);
   }
 
-  ports::interfaces::LoggerPtr PluginUiSession::logger() const noexcept
+  ports::LoggerPtr PluginUiSession::logger() const noexcept
   {
     return mLogger;
   }

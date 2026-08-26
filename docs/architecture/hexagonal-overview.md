@@ -586,7 +586,7 @@ flowchart LR
 | `StatisticsDockWidget` | `FakeStatisticsPanel` | `CompositionRootTests` — no `QMainWindow` |
 | real fetch/activate use cases | fake use cases | `StatisticsViewModelTests` (Qt allowed only on that target) |
 
-Application tests link `cw_api3d_application` + `cw_api3d_ports` only. Adapter tests use concept-sized `FakeHost*` so the template adapter compiles without the SDK. Composition tests inject `IStatisticsPanel` so the session's idempotence does not construct a dock.
+Application tests link `cw_api3d_application` + `cw_api3d_ports` only. Adapter tests use concept-sized `FakeHost*` so the template adapter compiles without the SDK; the host concepts live once in `src/adapters/driven/cadwork/HostContracts.h`. Composition tests inject `IStatisticsPanel` so the session's idempotence does not construct a dock.
 
 **What it shows.** Ports are the test seam. The core under test is the same binary shape as production.
 

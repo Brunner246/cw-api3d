@@ -14,8 +14,7 @@ using namespace cw_api3d::adapters::driven::logging;
 using namespace cw_api3d::ports;
 
 // Compile-time static assertions for concepts and interface inheritance
-static_assert(concepts::Logger<SpdLogLogger>, "SpdLogLogger must satisfy concepts::Logger");
-static_assert(std::derived_from<SpdLogLogger, interfaces::ILogger>, "SpdLogLogger must derive from ILogger");
+static_assert(std::derived_from<SpdLogLogger, ILogger>, "SpdLogLogger must derive from ILogger");
 
 class SpdLogLoggerTests : public ::testing::Test
 {

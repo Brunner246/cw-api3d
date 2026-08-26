@@ -5,18 +5,17 @@
 #include "tests/doubles/FakeLogger.h"
 #include "tests/doubles/FakeUtilityProvider.h"
 
+#include <concepts>
 #include <filesystem>
 #include <memory>
 
 using namespace cw_api3d::ports;
 using namespace cw_api3d::tests::doubles;
 
-static_assert(concepts::Logger<FakeLogger>, "FakeLogger must satisfy concepts::Logger");
-static_assert(concepts::UtilityProvider<FakeUtilityProvider>, "FakeUtilityProvider must satisfy concepts::UtilityProvider");
-static_assert(std::derived_from<FakeLogger, interfaces::ILogger>, "FakeLogger must derive from ILogger");
-static_assert(std::derived_from<FakeUtilityProvider, interfaces::IUtilityProvider>, "FakeUtilityProvider must derive from IUtilityProvider");
+static_assert(std::derived_from<FakeLogger, ILogger>, "FakeLogger must derive from ILogger");
+static_assert(std::derived_from<FakeUtilityProvider, IUtilityProvider>, "FakeUtilityProvider must derive from IUtilityProvider");
 
-TEST(PortConceptsTests, ParseLogLevelCaseInsensitive)
+TEST(PortContractsTests, ParseLogLevelCaseInsensitive)
 {
   EXPECT_EQ(parseLogLevel("trace"), LogLevel::Trace);
   EXPECT_EQ(parseLogLevel("DEBUG"), LogLevel::Debug);
@@ -31,7 +30,7 @@ TEST(PortConceptsTests, ParseLogLevelCaseInsensitive)
   EXPECT_EQ(parseLogLevel(""), std::nullopt);
 }
 
-TEST(PortConceptsTests, ToStringConversion)
+TEST(PortContractsTests, ToStringConversion)
 {
   EXPECT_EQ(toString(LogLevel::Trace), "Trace");
   EXPECT_EQ(toString(LogLevel::Debug), "Debug");
@@ -42,7 +41,7 @@ TEST(PortConceptsTests, ToStringConversion)
   EXPECT_EQ(toString(LogLevel::Off), "Off");
 }
 
-TEST(PortConceptsTests, FakeLoggerRecordsEntries)
+TEST(PortContractsTests, FakeLoggerRecordsEntries)
 {
   FakeLogger logger(LogLevel::Debug);
 
@@ -64,7 +63,7 @@ TEST(PortConceptsTests, FakeLoggerRecordsEntries)
   EXPECT_TRUE(logger.hasMessage(LogLevel::Critical, "Critical message"));
 }
 
-TEST(PortConceptsTests, FakeLoggerFormattingHelpers)
+TEST(PortContractsTests, FakeLoggerFormattingHelpers)
 {
   FakeLogger logger(LogLevel::Info);
 
@@ -75,7 +74,7 @@ TEST(PortConceptsTests, FakeLoggerFormattingHelpers)
   EXPECT_EQ(logger.count(), 0u);
 }
 
-TEST(PortConceptsTests, FakeUtilityProviderReturnsConfiguredPath)
+TEST(PortContractsTests, FakeUtilityProviderReturnsConfiguredPath)
 {
   FakeUtilityProvider provider;
   EXPECT_EQ(provider.getPluginPath(), std::nullopt);
@@ -88,14 +87,14 @@ TEST(PortConceptsTests, FakeUtilityProviderReturnsConfiguredPath)
   EXPECT_EQ(*result, testPath);
 }
 
-TEST(PortConceptsTests, DynamicPolymorphismViaInterfaces)
+TEST(PortContractsTests, DynamicPolymorphismViaInterfaces)
 {
-  std::unique_ptr<interfaces::ILogger> logger = std::make_unique<FakeLogger>();
+  std::unique_ptr<ILogger> logger = std::make_unique<FakeLogger>();
   logger->info("Dynamic dispatch log");
   auto* fake = dynamic_cast<FakeLogger*>(logger.get());
   ASSERT_NE(fake, nullptr);
   EXPECT_TRUE(fake->hasMessage(LogLevel::Info, "Dynamic dispatch log"));
 
-  std::unique_ptr<interfaces::IUtilityProvider> provider = std::make_unique<FakeUtilityProvider>(std::filesystem::path("D:/cadwork/plugins"));
+  std::unique_ptr<IUtilityProvider> provider = std::make_unique<FakeUtilityProvider>(std::filesystem::path("D:/cadwork/plugins"));
   EXPECT_EQ(provider->getPluginPath(), std::filesystem::path("D:/cadwork/plugins"));
 }

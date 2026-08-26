@@ -27,16 +27,16 @@ namespace cw_api3d::application
   {
   public:
     explicit ActivateElementsUseCase(
-      ports::interfaces::IElementActivation& activation,
-      ports::interfaces::ILogger& logger) noexcept
+      ports::IElementActivation& activation,
+      ports::ILogger& logger) noexcept
       : mActivation(&activation)
       , mLogger(&logger)
     {
     }
 
     explicit ActivateElementsUseCase(
-      ports::interfaces::ElementActivationPtr activation,
-      ports::interfaces::LoggerPtr logger) noexcept
+      ports::ElementActivationPtr activation,
+      ports::LoggerPtr logger) noexcept
       : mActivationPtr(std::move(activation))
       , mLoggerPtr(std::move(logger))
       , mActivation(mActivationPtr.get())
@@ -69,10 +69,10 @@ namespace cw_api3d::application
     }
 
   private:
-    ports::interfaces::ElementActivationPtr mActivationPtr;
-    ports::interfaces::LoggerPtr mLoggerPtr;
-    ports::interfaces::IElementActivation* mActivation{nullptr};
-    ports::interfaces::ILogger* mLogger{nullptr};
+    ports::ElementActivationPtr mActivationPtr;
+    ports::LoggerPtr mLoggerPtr;
+    ports::IElementActivation* mActivation{nullptr};
+    ports::ILogger* mLogger{nullptr};
   };
 
 } // namespace cw_api3d::application

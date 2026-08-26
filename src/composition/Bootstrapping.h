@@ -28,8 +28,8 @@ namespace cw_api3d::composition
   public:
     /// @brief Constructs bootstrapper with explicit driven adapter ports (useful for test injection).
     explicit PluginBootstrapper(
-      ports::interfaces::UtilityProviderPtr utilityProvider,
-      ports::interfaces::LoggerPtr logger) noexcept;
+      ports::UtilityProviderPtr utilityProvider,
+      ports::LoggerPtr logger) noexcept;
 
     /// @brief Creates a production bootstrapper configured with concrete SpdLogLogger and CadworkUtilityAdapter.
     [[nodiscard]] static std::unique_ptr<PluginBootstrapper> createProduction(
@@ -39,24 +39,24 @@ namespace cw_api3d::composition
     /// caller-supplied utility provider port. Lets tests exercise the real logger, use case and
     /// assembly without an SDK-shaped host double.
     [[nodiscard]] static std::unique_ptr<PluginBootstrapper> createProductionForUtilityProvider(
-      ports::interfaces::UtilityProviderPtr utilityProvider) noexcept;
+      ports::UtilityProviderPtr utilityProvider) noexcept;
 
     /// @brief Executes the composition root workflow.
     [[nodiscard]] std::expected<std::filesystem::path, std::string> run() noexcept;
 
-    [[nodiscard]] ports::interfaces::UtilityProviderPtr utilityProvider() const noexcept
+    [[nodiscard]] ports::UtilityProviderPtr utilityProvider() const noexcept
     {
       return mUtilityProvider;
     }
 
-    [[nodiscard]] ports::interfaces::LoggerPtr logger() const noexcept
+    [[nodiscard]] ports::LoggerPtr logger() const noexcept
     {
       return mLogger;
     }
 
   private:
-    ports::interfaces::UtilityProviderPtr mUtilityProvider;
-    ports::interfaces::LoggerPtr mLogger;
+    ports::UtilityProviderPtr mUtilityProvider;
+    ports::LoggerPtr mLogger;
     application::QueryPluginPathUseCase mUseCase;
   };
 

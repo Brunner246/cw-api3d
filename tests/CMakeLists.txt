@@ -39,8 +39,8 @@ function(cw_gtest name)
     gtest_discover_tests(${name})
 endfunction()
 
-cw_gtest(PortConceptsTests
-        ports/PortConceptsTests.cpp
+cw_gtest(PortContractsTests
+        ports/PortContractsTests.cpp
 )
 
 cw_gtest(QueryPluginPathUseCaseTests
@@ -76,8 +76,8 @@ target_include_directories(CompositionRootTests PRIVATE
 target_compile_features(CompositionRootTests PRIVATE cxx_std_23)
 cw_discover_composition_tests(CompositionRootTests)
 
-cw_gtest(ChartsPortConceptsTests
-        ports/ChartsPortConceptsTests.cpp
+cw_gtest(ChartsPortContractsTests
+        ports/ChartsPortContractsTests.cpp
 )
 
 cw_gtest(ElementSnapshotFixturesTests

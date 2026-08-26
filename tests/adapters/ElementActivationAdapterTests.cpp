@@ -18,9 +18,7 @@ using FakeAdapter = ElementActivationAdapter<FakeHostElementActivation>;
 
 static_assert(cw_api3d::adapters::driven::cadwork::concepts::ElementActivationSource<FakeHostElementActivation>,
               "FakeHostElementActivation must satisfy concepts::ElementActivationSource");
-static_assert(cw_api3d::ports::concepts::ElementActivation<FakeAdapter>,
-              "ElementActivationAdapter must satisfy ports::concepts::ElementActivation");
-static_assert(std::derived_from<FakeAdapter, interfaces::IElementActivation>,
+static_assert(std::derived_from<FakeAdapter, IElementActivation>,
               "ElementActivationAdapter must derive from IElementActivation");
 
 TEST(ElementActivationAdapterTests, AppendsIdsAndNeverDestroysList)

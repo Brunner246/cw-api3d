@@ -26,16 +26,16 @@ namespace cw_api3d::application
   {
   public:
     explicit FetchElementSnapshotUseCase(
-      ports::interfaces::IElementCatalog& catalog,
-      ports::interfaces::ILogger& logger) noexcept
+      ports::IElementCatalog& catalog,
+      ports::ILogger& logger) noexcept
       : mCatalog(&catalog)
       , mLogger(&logger)
     {
     }
 
     explicit FetchElementSnapshotUseCase(
-      ports::interfaces::ElementCatalogPtr catalog,
-      ports::interfaces::LoggerPtr logger) noexcept
+      ports::ElementCatalogPtr catalog,
+      ports::LoggerPtr logger) noexcept
       : mCatalogPtr(std::move(catalog))
       , mLoggerPtr(std::move(logger))
       , mCatalog(mCatalogPtr.get())
@@ -64,10 +64,10 @@ namespace cw_api3d::application
     }
 
   private:
-    ports::interfaces::ElementCatalogPtr mCatalogPtr;
-    ports::interfaces::LoggerPtr mLoggerPtr;
-    ports::interfaces::IElementCatalog* mCatalog{nullptr};
-    ports::interfaces::ILogger* mLogger{nullptr};
+    ports::ElementCatalogPtr mCatalogPtr;
+    ports::LoggerPtr mLoggerPtr;
+    ports::IElementCatalog* mCatalog{nullptr};
+    ports::ILogger* mLogger{nullptr};
   };
 
 } // namespace cw_api3d::application

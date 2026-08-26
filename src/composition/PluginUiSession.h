@@ -30,8 +30,8 @@ namespace cw_api3d::composition
     static void resetForTest(IStatisticsPanel& panel);
     static void resetInstance() noexcept;
 
-    void setLogger(ports::interfaces::LoggerPtr logger) noexcept;
-    [[nodiscard]] ports::interfaces::LoggerPtr logger() const noexcept;
+    void setLogger(ports::LoggerPtr logger) noexcept;
+    [[nodiscard]] ports::LoggerPtr logger() const noexcept;
     void setPanelFactory(PanelFactory factory);
 
     void showOrFocus();
@@ -40,7 +40,7 @@ namespace cw_api3d::composition
   private:
     IStatisticsPanel* mPanel{nullptr};
     PanelFactory mFactory;
-    ports::interfaces::LoggerPtr mLogger;
+    ports::LoggerPtr mLogger;
   };
 
 } // namespace cw_api3d::composition

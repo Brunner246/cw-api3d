@@ -11,7 +11,7 @@
 namespace cw_api3d::tests::doubles
 {
 
-  class FakeElementActivation : public ports::interfaces::IElementActivation
+  class FakeElementActivation : public ports::IElementActivation
   {
   public:
     void setFailure(std::string message)

@@ -24,7 +24,7 @@ namespace cw_api3d::composition
   {
     struct ProductionGraph
     {
-      ports::interfaces::LoggerPtr logger;
+      ports::LoggerPtr logger;
       adapters::driven::cadwork::CadworkElementCatalogHost catalogHost;
       adapters::driven::cadwork::CadworkElementActivationHost activationHost;
       std::unique_ptr<adapters::driven::cadwork::CadworkElementCatalogAdapter> catalog;
@@ -37,7 +37,7 @@ namespace cw_api3d::composition
 
     std::unique_ptr<ProductionGraph> gGraph;
 
-    void ensureGraph(CwAPI3D::ControllerFactory* factory, const ports::interfaces::LoggerPtr& logger)
+    void ensureGraph(CwAPI3D::ControllerFactory* factory, const ports::LoggerPtr& logger)
     {
       if (gGraph)
       {

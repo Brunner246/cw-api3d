@@ -63,6 +63,7 @@ namespace cw_api3d::adapters::driven::cadwork
 
   using CadworkElementCatalogAdapter = ElementCatalogAdapter<CadworkElementCatalogHost>;
 
-  extern template class ElementCatalogAdapter<CadworkElementCatalogHost>;
+  static_assert(concepts::ElementCatalogSource<CadworkElementCatalogHost>,
+                "CadworkElementCatalogHost must satisfy concepts::ElementCatalogSource");
 
 } // namespace cw_api3d::adapters::driven::cadwork

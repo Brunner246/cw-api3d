@@ -24,7 +24,7 @@ namespace cw_api3d::adapters::driving
     StatisticsDockWidget(
       StatisticsViewModel& viewModel,
       QMainWindow& host,
-      ports::interfaces::ILogger* logger = nullptr);
+      ports::ILogger* logger = nullptr);
 
     void showOrFocus() override;
 
@@ -39,7 +39,7 @@ namespace cw_api3d::adapters::driving
     void connectAboutToQuit();
 
     StatisticsViewModel* mViewModel{nullptr};
-    ports::interfaces::ILogger* mLogger{nullptr};
+    ports::ILogger* mLogger{nullptr};
     QQuickWidget* mQuickWidget{nullptr};
     QTableView* mTableView{nullptr};
     QLabel* mBanner{nullptr};

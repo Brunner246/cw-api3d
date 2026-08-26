@@ -1,91 +1,24 @@
 #pragma once
 
+#include "src/adapters/driven/cadwork/HostContracts.h"
 #include "src/application/ElementSnapshot.h"
 #include "src/ports/ElementCatalog.h"
 #include "src/ports/Logger.h"
 
 #include <cmath>
-#include <concepts>
 #include <cstdint>
 #include <exception>
 #include <expected>
 #include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 
 namespace cw_api3d::adapters::driven::cadwork
 {
 
-  namespace concepts
-  {
-
-    template<typename T>
-    concept HostString = requires(T& hostString) {
-      { hostString.data() } -> std::convertible_to<const wchar_t*>;
-    };
-
-    template<typename T>
-    concept HostStringPointer = std::is_pointer_v<T> && HostString<std::remove_pointer_t<T>>;
-
-    template<typename T>
-    concept HostIdList = requires(T& list, std::uint32_t index) {
-      { list.count() } -> std::convertible_to<std::uint32_t>;
-      { list.at(index) } -> std::convertible_to<application::ElementId>;
-    };
-
-    template<typename T>
-    concept HostIdListPointer = std::is_pointer_v<T> && HostIdList<std::remove_pointer_t<T>>;
-
-    template<typename T>
-    concept HostElementType = requires(T& type) {
-      { type.isFramedWall() } -> std::convertible_to<bool>;
-      { type.isSolidWoodWall() } -> std::convertible_to<bool>;
-      { type.isLogWall() } -> std::convertible_to<bool>;
-      { type.isWall() } -> std::convertible_to<bool>;
-      { type.isRectangularBeam() } -> std::convertible_to<bool>;
-      { type.isCircularBeam() } -> std::convertible_to<bool>;
-      { type.isPanel() } -> std::convertible_to<bool>;
-      { type.isOpening() } -> std::convertible_to<bool>;
-    };
-
-    template<typename T>
-    concept HostElementTypePointer = std::is_pointer_v<T> && HostElementType<std::remove_pointer_t<T>>;
-
-    template<typename T>
-    concept ElementCatalogSource = requires(T& host, application::ElementId id) {
-      { host.getActiveIdentifiableElementIDs() } -> HostIdListPointer;
-      { host.getAllIdentifiableElementIDs() } -> HostIdListPointer;
-      { host.getName(id) } -> HostStringPointer;
-      { host.getElementMaterialName(id) } -> HostStringPointer;
-      { host.getElementType(id) } -> HostElementTypePointer;
-      { host.getLength(id) } -> std::convertible_to<double>;
-      { host.getWidth(id) } -> std::convertible_to<double>;
-      { host.getHeight(id) } -> std::convertible_to<double>;
-      { host.getVolume(id) } -> std::convertible_to<double>;
-    };
-
-  } // namespace concepts
-
   namespace detail
   {
-
-    [[nodiscard]] constexpr std::string_view trimWhitespace(std::string_view text) noexcept
-    {
-      constexpr auto isSpace = [](const char c) noexcept {
-        return c == ' ' || c == '\t' || c == '\r' || c == '\n';
-      };
-      while (!text.empty() && isSpace(text.front()))
-      {
-        text.remove_prefix(1);
-      }
-      while (!text.empty() && isSpace(text.back()))
-      {
-        text.remove_suffix(1);
-      }
-      return text;
-    }
 
     inline void appendUtf8CodePoint(std::string& out, const char32_t codePoint)
     {
@@ -212,12 +145,12 @@ namespace cw_api3d::adapters::driven::cadwork
   } // namespace detail
 
   template<concepts::ElementCatalogSource Host>
-  class ElementCatalogAdapter final : public ports::interfaces::IElementCatalog
+  class ElementCatalogAdapter final : public ports::IElementCatalog
   {
   public:
     explicit ElementCatalogAdapter(
       Host* host = nullptr,
-      ports::interfaces::LoggerPtr logger = nullptr) noexcept
+      ports::LoggerPtr logger = nullptr) noexcept
       : mHost(host)
       , mLogger(std::move(logger))
     {
@@ -302,7 +235,7 @@ namespace cw_api3d::adapters::driven::cadwork
     }
 
     Host* mHost{nullptr};
-    ports::interfaces::LoggerPtr mLogger;
+    ports::LoggerPtr mLogger;
   };
 
 } // namespace cw_api3d::adapters::driven::cadwork

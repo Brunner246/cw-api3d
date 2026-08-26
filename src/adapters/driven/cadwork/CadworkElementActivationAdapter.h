@@ -29,6 +29,7 @@ namespace cw_api3d::adapters::driven::cadwork
 
   using CadworkElementActivationAdapter = ElementActivationAdapter<CadworkElementActivationHost>;
 
-  extern template class ElementActivationAdapter<CadworkElementActivationHost>;
+  static_assert(concepts::ElementActivationSource<CadworkElementActivationHost>,
+                "CadworkElementActivationHost must satisfy concepts::ElementActivationSource");
 
 } // namespace cw_api3d::adapters::driven::cadwork

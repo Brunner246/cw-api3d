@@ -14,7 +14,7 @@ namespace cw_api3d::composition
 
   bool bootstrapChartsPlugin(CwAPI3D::ControllerFactory* factory) noexcept
   {
-    ports::interfaces::LoggerPtr logger;
+    ports::LoggerPtr logger;
     try
     {
 #ifdef CW_API3D_HAS_DRIVING

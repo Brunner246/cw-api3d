@@ -13,6 +13,9 @@ namespace cw_api3d::adapters::driven::cadwork
   /// logic itself lives in UtilityControllerAdapter.h and is SDK-free.
   using CadworkUtilityAdapter = UtilityControllerAdapter<CwAPI3D::Interfaces::ICwAPI3DUtilityController>;
 
-  extern template class UtilityControllerAdapter<CwAPI3D::Interfaces::ICwAPI3DUtilityController>;
+  // Compile-time guard that the real host interface still fits the narrowed contract.
+  // A CwAPI3D release that renames getPluginPath()/narrowData() fails here, not in the tests.
+  static_assert(concepts::PluginPathSource<CwAPI3D::Interfaces::ICwAPI3DUtilityController>,
+                "ICwAPI3DUtilityController must satisfy concepts::PluginPathSource");
 
 } // namespace cw_api3d::adapters::driven::cadwork

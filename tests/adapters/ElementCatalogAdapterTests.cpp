@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 
+#include "src/adapters/driven/cadwork/ElementActivationAdapter.h"
 #include "src/adapters/driven/cadwork/ElementCatalogAdapter.h"
+// Guards the shared HostContracts.h: all three adapter headers must coexist in one TU.
+#include "src/adapters/driven/cadwork/UtilityControllerAdapter.h"
 #include "src/ports/ElementCatalog.h"
 #include "tests/doubles/FakeHostElementCatalog.h"
 #include "tests/doubles/FakeLogger.h"
@@ -21,9 +24,7 @@ using FakeAdapter = ElementCatalogAdapter<FakeHostElementCatalog>;
 
 static_assert(cw_api3d::adapters::driven::cadwork::concepts::ElementCatalogSource<FakeHostElementCatalog>,
               "FakeHostElementCatalog must satisfy concepts::ElementCatalogSource");
-static_assert(cw_api3d::ports::concepts::ElementCatalog<FakeAdapter>,
-              "ElementCatalogAdapter must satisfy ports::concepts::ElementCatalog");
-static_assert(std::derived_from<FakeAdapter, interfaces::IElementCatalog>,
+static_assert(std::derived_from<FakeAdapter, IElementCatalog>,
               "ElementCatalogAdapter must derive from IElementCatalog");
 
 TEST(ElementCatalogAdapterTests, CopiesActiveIdsAndNeverDestroysHostObjects)

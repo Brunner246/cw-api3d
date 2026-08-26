@@ -82,7 +82,7 @@ namespace cw_api3d::adapters::driving
   StatisticsDockWidget::StatisticsDockWidget(
     StatisticsViewModel& viewModel,
     QMainWindow& host,
-    ports::interfaces::ILogger* logger)
+    ports::ILogger* logger)
     : QDockWidget(&host)
     , mViewModel(&viewModel)
     , mLogger(logger)

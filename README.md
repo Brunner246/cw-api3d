@@ -8,7 +8,7 @@ The plugin loads inside cadwork, reads the element catalogue through a driven po
 
 Architecture: [docs/architecture/README.md](docs/architecture/README.md).
 
-- `src/ports/` — `ILogger`, `IUtilityProvider`, `IElementCatalog`, `IElementActivation` and matching C++20 concepts.
+- `src/ports/` — `ILogger`, `IUtilityProvider`, `IElementCatalog`, `IElementActivation` — plain virtual interfaces, no parallel concepts.
 - `src/application/` — `QueryPluginPathUseCase`, `FetchElementSnapshotUseCase`, `ActivateElementsUseCase`, `ElementStatisticsAggregator`. No Qt, no CwAPI3D.
 - `src/adapters/driven/` — `SpdLogLogger`; `CadworkUtilityAdapter`, `CadworkElementCatalogAdapter`, `CadworkElementActivationAdapter`.
 - `src/adapters/driving/statistics/` — Qt view models, the dock widget, and `StatisticsPanel.qml`.
