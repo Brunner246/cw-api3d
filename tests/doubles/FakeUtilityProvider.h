@@ -9,7 +9,7 @@
 namespace cw_api3d::tests::doubles
 {
 
-  class FakeUtilityProvider : public ports::interfaces::IUtilityProvider
+  class FakeUtilityProvider : public ports::IUtilityProvider
   {
   public:
     explicit FakeUtilityProvider(std::optional<std::filesystem::path> pluginPath = std::nullopt) noexcept

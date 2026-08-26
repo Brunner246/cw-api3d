@@ -24,13 +24,10 @@ namespace cw_api3d::adapters::driven::cadwork
       { hostString.narrowData() } -> std::convertible_to<const char*>;
     };
 
-    template<typename T>
-    concept HostStringPointer = std::is_pointer_v<T> && HostString<std::remove_pointer_t<T>>;
-
     /// @brief Minimal host contract this adapter needs: a plugin path as a host string.
     template<typename T>
     concept PluginPathSource = requires(T& controller) {
-      { controller.getPluginPath() } -> HostStringPointer;
+      requires HostString<std::remove_pointer_t<decltype(controller.getPluginPath())>>;
     };
 
   } // namespace concepts
@@ -56,17 +53,17 @@ namespace cw_api3d::adapters::driven::cadwork
 
   } // namespace detail
 
-  /// @brief Driven adapter translating a host utility controller into ports::interfaces::IUtilityProvider.
+  /// @brief Driven adapter translating a host utility controller into ports::IUtilityProvider.
   /// Constrained on concepts::PluginPathSource rather than a concrete SDK interface, so test doubles
   /// need only the two methods actually used instead of the whole host interface.
   /// Safely extracts plugin path string data without calling destroy() on host-owned strings.
   template<concepts::PluginPathSource Controller>
-  class UtilityControllerAdapter final : public ports::interfaces::IUtilityProvider
+  class UtilityControllerAdapter final : public ports::IUtilityProvider
   {
   public:
     explicit UtilityControllerAdapter(
       Controller* utilityController = nullptr,
-      ports::interfaces::LoggerPtr logger = nullptr) noexcept
+      ports::LoggerPtr logger = nullptr) noexcept
       : mUtilityController(utilityController)
       , mLogger(std::move(logger))
     {
@@ -137,7 +134,7 @@ namespace cw_api3d::adapters::driven::cadwork
     }
 
     Controller* mUtilityController{nullptr};
-    ports::interfaces::LoggerPtr mLogger;
+    ports::LoggerPtr mLogger;
   };
 
 } // namespace cw_api3d::adapters::driven::cadwork

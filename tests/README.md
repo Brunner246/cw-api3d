@@ -115,7 +115,7 @@ ctest --test-dir out/build/local-relwithdebinfo --output-on-failure
 ### Step 4: (Optional) Run Specific Test Executables
 Directly execute individual test binaries located under `out/build/<preset>/bin/<config>/`:
 ```bash
-./out/build/local-relwithdebinfo/bin/relwithdebinfo/PortConceptsTests.exe
+./out/build/local-relwithdebinfo/bin/relwithdebinfo/PortContractsTests.exe
 ./out/build/local-relwithdebinfo/bin/relwithdebinfo/QueryPluginPathUseCaseTests.exe
 ./out/build/local-relwithdebinfo/bin/relwithdebinfo/SpdLogLoggerTests.exe
 ./out/build/local-relwithdebinfo/bin/relwithdebinfo/UtilityControllerAdapterTests.exe

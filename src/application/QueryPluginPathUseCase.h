@@ -30,8 +30,8 @@ namespace cw_api3d::application
   public:
     /// @brief Constructor accepting driven port references.
     explicit QueryPluginPathUseCase(
-      ports::interfaces::IUtilityProvider& utilityProvider,
-      ports::interfaces::ILogger& logger) noexcept
+      ports::IUtilityProvider& utilityProvider,
+      ports::ILogger& logger) noexcept
       : mUtilityProvider(&utilityProvider)
       , mLogger(&logger)
     {
@@ -39,8 +39,8 @@ namespace cw_api3d::application
 
     /// @brief Constructor accepting driven port shared ownership pointers.
     explicit QueryPluginPathUseCase(
-      ports::interfaces::UtilityProviderPtr utilityProvider,
-      ports::interfaces::LoggerPtr logger) noexcept
+      ports::UtilityProviderPtr utilityProvider,
+      ports::LoggerPtr logger) noexcept
       : mUtilityProviderPtr(std::move(utilityProvider))
       , mLoggerPtr(std::move(logger))
       , mUtilityProvider(mUtilityProviderPtr.get())
@@ -72,10 +72,10 @@ namespace cw_api3d::application
     }
 
   private:
-    ports::interfaces::UtilityProviderPtr mUtilityProviderPtr;
-    ports::interfaces::LoggerPtr mLoggerPtr;
-    ports::interfaces::IUtilityProvider* mUtilityProvider{nullptr};
-    ports::interfaces::ILogger* mLogger{nullptr};
+    ports::UtilityProviderPtr mUtilityProviderPtr;
+    ports::LoggerPtr mLoggerPtr;
+    ports::IUtilityProvider* mUtilityProvider{nullptr};
+    ports::ILogger* mLogger{nullptr};
   };
 
 } // namespace cw_api3d::application

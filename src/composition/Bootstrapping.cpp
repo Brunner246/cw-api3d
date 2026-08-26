@@ -34,7 +34,7 @@ namespace cw_api3d::composition
 
     [[nodiscard]] CwAPI3D::Interfaces::ICwAPI3DUtilityController* resolveUtilityController(
       CwAPI3D::ControllerFactory* factory,
-      ports::interfaces::ILogger& logger) noexcept
+      ports::ILogger& logger) noexcept
     {
       if (factory == nullptr)
       {
@@ -59,8 +59,8 @@ namespace cw_api3d::composition
   } // namespace
 
   PluginBootstrapper::PluginBootstrapper(
-    ports::interfaces::UtilityProviderPtr utilityProvider,
-    ports::interfaces::LoggerPtr logger) noexcept
+    ports::UtilityProviderPtr utilityProvider,
+    ports::LoggerPtr logger) noexcept
     : mUtilityProvider(std::move(utilityProvider))
     , mLogger(std::move(logger))
     , mUseCase(mUtilityProvider, mLogger)
@@ -87,7 +87,7 @@ namespace cw_api3d::composition
   }
 
   std::unique_ptr<PluginBootstrapper> PluginBootstrapper::createProductionForUtilityProvider(
-    ports::interfaces::UtilityProviderPtr utilityProvider) noexcept
+    ports::UtilityProviderPtr utilityProvider) noexcept
   {
     try
     {

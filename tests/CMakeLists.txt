@@ -1,18 +1,18 @@
 find_package(GTest CONFIG REQUIRED)
 
-# Port Concepts & Interfaces Tests
-add_executable(PortConceptsTests
-    ports/PortConceptsTests.cpp
+# Port Interface Contract Tests
+add_executable(PortContractsTests
+    ports/PortContractsTests.cpp
 )
-target_link_libraries(PortConceptsTests PRIVATE
+target_link_libraries(PortContractsTests PRIVATE
     cw_api3d_ports
     GTest::gtest
     GTest::gtest_main
 )
-target_include_directories(PortConceptsTests PRIVATE
+target_include_directories(PortContractsTests PRIVATE
     ${CMAKE_SOURCE_DIR}
 )
-target_compile_features(PortConceptsTests PRIVATE cxx_std_23)
+target_compile_features(PortContractsTests PRIVATE cxx_std_23)
 
 # Application Use Case Tests
 add_executable(QueryPluginPathUseCaseTests
@@ -77,7 +77,7 @@ target_include_directories(CompositionRootTests PRIVATE
 target_compile_features(CompositionRootTests PRIVATE cxx_std_23)
 
 include(GoogleTest)
-gtest_discover_tests(PortConceptsTests)
+gtest_discover_tests(PortContractsTests)
 gtest_discover_tests(QueryPluginPathUseCaseTests)
 gtest_discover_tests(SpdLogLoggerTests)
 gtest_discover_tests(UtilityControllerAdapterTests)

@@ -15,12 +15,10 @@ using namespace cw_api3d::tests::doubles;
 
 using FakeAdapter = UtilityControllerAdapter<FakeHostUtilityController>;
 
-// Compile-time assertions for the narrowed host contract, the port concept and interface inheritance
+// Compile-time assertions for the narrowed host contract and port interface inheritance
 static_assert(cw_api3d::adapters::driven::cadwork::concepts::PluginPathSource<FakeHostUtilityController>,
               "FakeHostUtilityController must satisfy concepts::PluginPathSource");
-static_assert(cw_api3d::ports::concepts::UtilityProvider<FakeAdapter>,
-              "UtilityControllerAdapter must satisfy ports::concepts::UtilityProvider");
-static_assert(std::derived_from<FakeAdapter, interfaces::IUtilityProvider>,
+static_assert(std::derived_from<FakeAdapter, IUtilityProvider>,
               "UtilityControllerAdapter must derive from IUtilityProvider");
 
 TEST(UtilityControllerAdapterTests, ReturnsValidPathWhenHostProvidesString)

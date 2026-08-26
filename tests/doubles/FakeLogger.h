@@ -16,7 +16,7 @@ namespace cw_api3d::tests::doubles
     bool operator==(const LogEntry& other) const = default;
   };
 
-  class FakeLogger : public ports::interfaces::ILogger
+  class FakeLogger : public ports::ILogger
   {
   public:
     explicit FakeLogger(ports::LogLevel initialLevel = ports::LogLevel::Trace) noexcept

@@ -14,8 +14,8 @@ namespace cw_api3d::adapters::driven::logging
 {
 
   /// @brief Driven adapter wrapping the spdlog logging library.
-  /// Satisfies cw_api3d::ports::concepts::Logger and implements cw_api3d::ports::interfaces::ILogger.
-  class SpdLogLogger : public ports::interfaces::ILogger
+  /// Implements cw_api3d::ports::ILogger.
+  class SpdLogLogger : public ports::ILogger
   {
   public:
     /// @brief Constructs adapter with a specific spdlog logger instance.
