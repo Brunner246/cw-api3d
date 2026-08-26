@@ -4,7 +4,7 @@ C++ CAD plugin and SDK integration library for cadwork 3D, implementing Ports & 
 
 ## Structure
 
-- `src/ports/` — Port interfaces (`ILogger`, `IUtilityProvider`) and C++20 concepts (`concepts::Logger`, `concepts::UtilityProvider`).
+- `src/ports/` — Port interfaces (`ILogger`, `IUtilityProvider`).
 - `src/application/` — Application use cases (`IQueryPluginPathUseCase`, `QueryPluginPathUseCase`) orchestrating core logic via driven port interfaces.
 - `src/adapters/driven/` — Driven adapters:
   - `logging/` (`SpdLogLogger` wrapping spdlog).
