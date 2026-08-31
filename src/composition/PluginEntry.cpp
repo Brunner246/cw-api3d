@@ -22,9 +22,3 @@ CWAPI3D_PLUGIN bool plugin_x64_init(CwAPI3D::ControllerFactory* aFactory)
   [[maybe_unused]] const bool success = cw_api3d::composition::bootstrapPlugin(aFactory);
   return false;
 }
-
-CWAPI3D_PLUGIN bool init_cwapi3d(CwAPI3D::ControllerFactory* aFactory)
-{
-  [[maybe_unused]] const bool success = cw_api3d::composition::bootstrapPlugin(aFactory);
-  return false;
-}
