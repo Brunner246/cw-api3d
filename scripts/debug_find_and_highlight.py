@@ -2,7 +2,10 @@
 
 Set CW_DEBUG_SEARCH before launching, or edit SEARCH_TEXT below. Run against a live 3d.exe:
 
-    ci_start.exe <model> /EXE=<exe_dir> /RUNPROGRAM=<absolute path to this file>
+    ci_start.exe <model> /EXE=<exe_dir> 
+
+PS> $env:CW_DEBUG_SEARCH="pfosten"                                                        
+PS> D:\\cadwork.dir\\ci_start.exe "C:\\Users\\MichaelBrunner\\Downloads\\runner\\test_iw.3d" 
 """
 
 import os
@@ -39,4 +42,4 @@ def main():
     visualization_controller.zoom_active_elements()
 
 
-main()
+main() 

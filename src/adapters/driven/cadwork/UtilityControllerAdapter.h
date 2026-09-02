@@ -18,7 +18,6 @@ namespace cw_api3d::adapters::driven::cadwork
   {
 
     /// @brief Host-owned string as seen by this adapter: narrow character data, nothing more.
-    /// Deliberately excludes destroy() so the adapter body cannot reach it.
     template<typename T>
     concept HostString = requires(T& hostString) {
       { hostString.narrowData() } -> std::convertible_to<const char*>;

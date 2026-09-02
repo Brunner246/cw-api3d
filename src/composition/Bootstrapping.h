@@ -36,8 +36,7 @@ namespace cw_api3d::composition
       CwAPI3D::ControllerFactory* factory) noexcept;
 
     /// @brief Creates a bootstrapper with the production logger and log-level policy wired to a
-    /// caller-supplied utility provider port. Lets tests exercise the real logger, use case and
-    /// assembly without an SDK-shaped host double.
+    /// caller-supplied utility provider port.
     [[nodiscard]] static std::unique_ptr<PluginBootstrapper> createProductionForUtilityProvider(
       ports::UtilityProviderPtr utilityProvider) noexcept;
 

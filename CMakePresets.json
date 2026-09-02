@@ -16,6 +16,7 @@
           "value": "$penv{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
           "type": "FILEPATH"
         },
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_C_COMPILER": "cl.exe",
         "CMAKE_CXX_COMPILER": "cl.exe",
         "CMAKE_LINKER": "link.exe",

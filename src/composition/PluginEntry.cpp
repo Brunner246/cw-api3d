@@ -14,11 +14,8 @@
 
 #include <cwapi3d/CwAPI3D.h>
 
-/// In cadwork CwAPI3D conventions, plugin_x64_init returning false indicates
-/// the plugin stays loaded / completes cleanly without triggering an interactive
-/// '<Return> to continue' host modal.
 CWAPI3D_PLUGIN bool plugin_x64_init(CwAPI3D::ControllerFactory* aFactory)
 {
   [[maybe_unused]] const bool success = cw_api3d::composition::bootstrapPlugin(aFactory);
-  return false;
+  return true;
 }

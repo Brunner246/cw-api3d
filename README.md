@@ -23,7 +23,7 @@ For detailed instructions on building and running the test suites, see [tests/RE
 
 ### Quick Commands
 
-Invoke wraps CMake / CTest / pytest and loads MSVC toolset 14.44 automatically. Default preset is `local-relwithdebinfo`.
+Invoke wraps CMake / CTest / pytest and loads the newest installed MSVC toolset (14.44 or newer) automatically. Default preset is `local-relwithdebinfo`.
 
 ```powershell
 uv sync

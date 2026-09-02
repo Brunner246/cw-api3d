@@ -9,7 +9,7 @@ This directory contains the automated test suites for `cw-api3d`:
 ## 1. Prerequisites
 
 ### C++ Build & Test Toolchain
-- **Visual Studio 2022** (MSVC toolset **14.44+** required for C++23 features)
+- **Visual Studio 2022 or newer** (MSVC toolset **14.44 or newer** required for C++23 features)
 - **CMake** (3.25+) and **Ninja**
 - **vcpkg** (providing `spdlog`, `fmt`, and `gtest`)
 
@@ -55,7 +55,7 @@ uv run invoke --list
 
 ## 3. Invoke (recommended)
 
-`tasks.py` at the repository root wraps configure / build / CTest / pytest. It loads MSVC toolset **14.44** via `vcvars64.bat`, so a Developer shell is not required. Default preset: `local-relwithdebinfo`.
+`tasks.py` at the repository root wraps configure / build / CTest / pytest. It loads the newest installed MSVC toolset (**14.44 or newer**) via `vcvars64.bat`, so a Developer shell is not required. Default preset: `local-relwithdebinfo`.
 
 ```powershell
 uv sync
@@ -91,10 +91,10 @@ The sections below are the same commands Invoke runs, for when you need to step 
 
 ## 4. Running C++ Tests (GoogleTest / CTest)
 
-### Step 1: Initialize MSVC 14.44 Toolset Environment
-In PowerShell or Command Prompt:
+### Step 1: Initialize the MSVC Toolset Environment
+Use the newest Visual Studio on the machine and omit `-vcvars_ver`, so `vcvars64.bat` picks its newest toolset (must be 14.44 or newer):
 ```powershell
-cmd.exe /c "call ""C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"" -vcvars_ver=14.44 && pwsh"
+cmd.exe /c "call ""C:\Program Files\Microsoft Visual Studio\18\Professional\VC\Auxiliary\Build\vcvars64.bat"" && pwsh"
 ```
 
 ### Step 2: Configure & Build

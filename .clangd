@@ -1,0 +1,25 @@
+# clangd IntelliSense configuration.
+#
+# The CMake build tree lives under out/build/<preset>, which is outside clangd's
+# default search for compile_commands.json (the source directory, its ancestors,
+# and a build/ subdirectory of each). Without this pointer clangd falls back to a
+# bare clang invocation with no MSVC toolchain and no project include path, and
+# reports the whole tree as broken even though it compiles cleanly.
+#
+# Path is relative to the directory holding this file.
+
+CompileFlags:
+  CompilationDatabase: out/build/local-debug
+
+---
+# CadworkUtilityAdapter.h includes <cwapi3d/...>, but the only translation units
+# carrying that include path are in src/composition. clangd infers header flags
+# from the nearest database entry by path proximity, not by include graph, so
+# this directory needs the SDK path added explicitly.
+#
+# PathMatch is relative to this file's directory; the -I is relative to the
+# compile command's directory, i.e. the build tree named above.
+If:
+  PathMatch: src/adapters/driven/cadwork/.*
+CompileFlags:
+  Add: [-I_deps/cwapi3dcpp-src/include]
